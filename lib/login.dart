@@ -131,6 +131,7 @@ class _LoginState extends State<Login> {
             style: GoogleFonts.poppins(
               fontSize: 40,
               fontWeight: FontWeight.bold,
+              height: 0,
             ),
           ),
           Text(
@@ -139,6 +140,7 @@ class _LoginState extends State<Login> {
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white54,
+              height: 0,
             ),
           ),
           _divider(15),
@@ -161,6 +163,10 @@ class _LoginState extends State<Login> {
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(color: Colors.white),
             borderRadius: BorderRadius.circular(20),
+          ),
+          errorStyle: GoogleFonts.poppins(
+            height: 0,
+            fontStyle: FontStyle.italic,
           ),
         ),
         validator: (username) {
@@ -201,6 +207,10 @@ class _LoginState extends State<Login> {
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(color: Colors.white),
             borderRadius: BorderRadius.circular(20),
+          ),
+          errorStyle: GoogleFonts.poppins(
+            height: 0,
+            fontStyle: FontStyle.italic,
           ),
         ),
         validator: (pass) {

@@ -19,9 +19,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  customAppBar() => AppBar(
-        backgroundColor: Colors.transparent,
-        actions: [
+  appBarActions() => Row(
+        children: [
           IconButton(
             splashRadius: 20,
             onPressed: () {},
@@ -46,25 +45,34 @@ class _HomeState extends State<Home> {
               child: Icon(Icons.notifications_none),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 5,
           ),
         ],
-        elevation: 0,
-        leading: InkWell(
-          borderRadius: BorderRadius.circular(100),
-          onTap: () {},
-          child: Ink(
-            child: Padding(
-              padding: const EdgeInsets.all(13),
-              child: ClipOval(
-                child: Image(
-                  image: AssetImage('assets/images/photo_male_7.jpg'),
-                ),
+      );
+
+  customLeading() => InkWell(
+        borderRadius: BorderRadius.circular(100),
+        onTap: () {},
+        child: Ink(
+          child: const Padding(
+            padding: EdgeInsets.all(13),
+            child: ClipOval(
+              child: Image(
+                image: AssetImage('assets/images/photo_male_7.jpg'),
               ),
             ),
           ),
         ),
+      );
+
+  customAppBar() => AppBar(
+        backgroundColor: Colors.transparent,
+        actions: [
+          appBarActions(),
+        ],
+        elevation: 0,
+        leading: customLeading(),
         title: Text(
           'Blog.',
           style: GoogleFonts.poppins(

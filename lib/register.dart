@@ -35,6 +35,7 @@ class _RegisterState extends State<Register> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  spacing(15, 0),
                   backIcon(),
                   spacing(20, 0),
                   greeting(),
@@ -206,6 +207,8 @@ class _RegisterState extends State<Register> {
         decoration: InputDecoration(
           errorStyle: GoogleFonts.poppins(
             fontSize: 12,
+            height: 0,
+            fontStyle: FontStyle.italic,
           ),
           suffixIcon: suffix,
           prefixIcon: icon,
@@ -248,9 +251,16 @@ class _RegisterState extends State<Register> {
   Widget appLogo() => Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Image.asset(
-            'assets/images/blog2.png',
-            height: 40,
+          // Image.asset(
+          //   'assets/images/blog2.png',
+          //   height: 40,
+          // ),
+          Text(
+            'Blog.',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+            ),
           ),
           spacing(10, 0),
           Text(
@@ -289,24 +299,14 @@ class _RegisterState extends State<Register> {
         onTap: () {
           Navigator.pop(context);
         },
-        child: Container(
-          padding:
-              EdgeInsets.only(top: MediaQuery.of(context).size.width - 330),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Icon(
-                Icons.arrow_back_ios_new_rounded,
-              ),
-              Text(
-                'Back',
-                style: GoogleFonts.poppins(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: const [
+            Icon(
+              Icons.arrow_back_rounded,
+              size: 20,
+            ),
+          ],
         ),
       );
 }
