@@ -51,11 +51,18 @@ class _HomeState extends State<Home> {
           ),
         ],
         elevation: 0,
-        leading: IconButton(
-          splashRadius: 20,
-          onPressed: () {},
-          icon: Icon(
-            Icons.account_circle,
+        leading: InkWell(
+          borderRadius: BorderRadius.circular(100),
+          onTap: () {},
+          child: Ink(
+            child: Padding(
+              padding: const EdgeInsets.all(13),
+              child: ClipOval(
+                child: Image(
+                  image: AssetImage('assets/images/photo_male_7.jpg'),
+                ),
+              ),
+            ),
           ),
         ),
         title: Text(
