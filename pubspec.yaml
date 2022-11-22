@@ -39,6 +39,7 @@ dependencies:
   google_fonts: ^3.0.1
   email_validator: ^2.1.17
   badges: ^2.0.3
+  firebase_core: ^2.3.0
 
 dev_dependencies:
   flutter_test:
