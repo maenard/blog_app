@@ -27,97 +27,100 @@ class _RegisterState extends State<Register> {
       body: Form(
         key: formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: ListView(
-          padding: EdgeInsets.all(0),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  spacing(15, 0),
-                  backIcon(),
-                  spacing(20, 0),
-                  greeting(),
-                  spacing(10, 0),
-                  formControl(
-                    'Full Name',
-                    false,
-                    Icon(Icons.person_outline_rounded),
-                    (name) {
-                      if (name != null && name.length < 1) {
-                        return 'Fill out this field';
-                      } else {
-                        return null;
-                      }
-                    },
-                    null,
-                  ),
-                  spacing(10, 0),
-                  formControl(
-                    'Username',
-                    false,
-                    Icon(Icons.alternate_email),
-                    (username) {
-                      if (username != null && username.length < 4) {
-                        return 'Enter minimum 4 charaters';
-                      } else {
-                        return null;
-                      }
-                    },
-                    null,
-                  ),
-                  spacing(10, 0),
-                  formControl(
-                    'Password',
-                    passView,
-                    Icon(Icons.lock_outline_rounded),
-                    (pass) {
-                      if (pass != null && pass.length < 7) {
-                        return 'Enter minimum 7 characters';
-                      } else {
-                        null;
-                      }
-                    },
-                    IconButton(
-                      icon: _visibility,
-                      onPressed: () {
-                        setState(() {
-                          if (passView == true) {
-                            _visibility = const Icon(Icons.visibility);
-                            passView = false;
-                          } else if (passView == false) {
-                            _visibility = const Icon(Icons.visibility_off);
-                            passView = true;
-                          }
-                        });
+        child: SafeArea(
+          child: ListView(
+            physics: BouncingScrollPhysics(),
+            padding: EdgeInsets.all(0),
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    spacing(15, 0),
+                    backIcon(),
+                    spacing(20, 0),
+                    greeting(),
+                    spacing(10, 0),
+                    formControl(
+                      'Full Name',
+                      false,
+                      Icon(Icons.person_outline_rounded),
+                      (name) {
+                        if (name != null && name.length < 1) {
+                          return 'Fill out this field';
+                        } else {
+                          return null;
+                        }
                       },
+                      null,
                     ),
-                  ),
-                  spacing(10, 0),
-                  formControl(
-                    'Email',
-                    false,
-                    Icon(Icons.email_outlined),
-                    (email) {
-                      if (email != null && !EmailValidator.validate(email)) {
-                        return 'Enter a valid email';
-                      } else {
-                        null;
-                      }
-                    },
-                    null,
-                  ),
-                  spacing(10, 0),
-                  regBtn(),
-                  spacing(5, 0),
-                  login(),
-                  spacing(MediaQuery.of(context).size.height - 600, 0),
-                  appLogo(),
-                ],
+                    spacing(10, 0),
+                    formControl(
+                      'Username',
+                      false,
+                      Icon(Icons.alternate_email),
+                      (username) {
+                        if (username != null && username.length < 4) {
+                          return 'Enter minimum 4 charaters';
+                        } else {
+                          return null;
+                        }
+                      },
+                      null,
+                    ),
+                    spacing(10, 0),
+                    formControl(
+                      'Password',
+                      passView,
+                      Icon(Icons.lock_outline_rounded),
+                      (pass) {
+                        if (pass != null && pass.length < 7) {
+                          return 'Enter minimum 7 characters';
+                        } else {
+                          null;
+                        }
+                      },
+                      IconButton(
+                        icon: _visibility,
+                        onPressed: () {
+                          setState(() {
+                            if (passView == true) {
+                              _visibility = const Icon(Icons.visibility);
+                              passView = false;
+                            } else if (passView == false) {
+                              _visibility = const Icon(Icons.visibility_off);
+                              passView = true;
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                    spacing(10, 0),
+                    formControl(
+                      'Email',
+                      false,
+                      Icon(Icons.email_outlined),
+                      (email) {
+                        if (email != null && !EmailValidator.validate(email)) {
+                          return 'Enter a valid email';
+                        } else {
+                          null;
+                        }
+                      },
+                      null,
+                    ),
+                    spacing(10, 0),
+                    regBtn(),
+                    spacing(5, 0),
+                    login(),
+                    spacing(MediaQuery.of(context).size.height - 600, 0),
+                    appLogo(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -295,18 +298,15 @@ class _RegisterState extends State<Register> {
         ],
       );
 
-  Widget backIcon() => GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: const [
-            Icon(
-              Icons.arrow_back_rounded,
-              size: 20,
-            ),
-          ],
-        ),
+  Widget backIcon() => Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_rounded),
+          ),
+        ],
       );
 }

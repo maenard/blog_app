@@ -1,4 +1,6 @@
 import 'package:badges/badges.dart';
+import 'package:blog_app/profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,9 +15,12 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: customAppBar(),
-      body: Center(child: Text('Home')),
+      body: SafeArea(
+        child: Center(
+          child: Text('Home'),
+        ),
+      ),
     );
   }
 
@@ -45,15 +50,23 @@ class _HomeState extends State<Home> {
               child: Icon(Icons.notifications_none),
             ),
           ),
-          const SizedBox(
-            width: 5,
-          ),
+          profileTab(),
+          // const SizedBox(
+          //   width: 5,
+          // ),
         ],
       );
 
-  customLeading() => InkWell(
+  profileTab() => InkWell(
         borderRadius: BorderRadius.circular(100),
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Profile(),
+            ),
+          );
+        },
         child: Ink(
           child: const Padding(
             padding: EdgeInsets.all(13),
@@ -67,18 +80,18 @@ class _HomeState extends State<Home> {
       );
 
   customAppBar() => AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         actions: [
           appBarActions(),
         ],
         elevation: 0,
-        leading: customLeading(),
         title: Text(
           'Blog.',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
           ),
         ),
-        titleSpacing: 0,
+        titleSpacing: 10,
       );
 }

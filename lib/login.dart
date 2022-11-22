@@ -1,5 +1,9 @@
 import 'package:blog_app/home.dart';
+import 'package:blog_app/main.dart';
 import 'package:blog_app/register.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,7 +19,7 @@ class _LoginState extends State<Login> {
   final formKey = GlobalKey<FormState>();
   late bool passView;
   late Icon _visibility;
-  late TextEditingController _usernameController;
+  late TextEditingController _emailController;
   late TextEditingController _passController;
 
   @override
@@ -23,13 +27,13 @@ class _LoginState extends State<Login> {
     super.initState();
     passView = true;
     _visibility = const Icon(Icons.visibility_off);
-    _usernameController = TextEditingController();
+    _emailController = TextEditingController();
     _passController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passController.dispose();
     super.dispose();
   }
@@ -41,6 +45,7 @@ class _LoginState extends State<Login> {
         key: formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
+          physics: BouncingScrollPhysics(),
           padding: EdgeInsets.all(0),
           children: [
             Center(
@@ -55,9 +60,9 @@ class _LoginState extends State<Login> {
                     _divider(20),
                     _appTitle(),
                     userName(
-                      'Username',
+                      'Email',
                       false,
-                      const Icon(Icons.person_outline_outlined),
+                      const Icon(Icons.email_outlined),
                     ),
                     _divider(20),
                     passWord(
@@ -129,18 +134,19 @@ class _LoginState extends State<Login> {
           Text(
             'Welcome Back',
             style: GoogleFonts.poppins(
+              color: Colors.white,
               fontSize: 40,
               fontWeight: FontWeight.bold,
-              height: 0,
+              height: 0.9,
             ),
           ),
           Text(
             'Log in your account!',
             style: GoogleFonts.poppins(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
+              // fontWeight: FontWeight.bold,
               color: Colors.white54,
-              height: 0,
+              height: 0.7,
             ),
           ),
           _divider(15),
@@ -148,7 +154,7 @@ class _LoginState extends State<Login> {
       );
 
   Widget userName(String text, bool bool, Icon icon) => TextFormField(
-        controller: _usernameController,
+        controller: _emailController,
         obscureText: bool,
         decoration: InputDecoration(
           hintText: text,
@@ -169,11 +175,11 @@ class _LoginState extends State<Login> {
             fontStyle: FontStyle.italic,
           ),
         ),
-        validator: (username) {
-          if (username != null && username.isEmpty) {
-            return 'Fill out this field';
+        validator: (email) {
+          if (email != null && !EmailValidator.validate(email)) {
+            return 'Enter a valid email';
           } else {
-            return null;
+            null;
           }
         },
       );
@@ -233,7 +239,7 @@ class _LoginState extends State<Login> {
               onPressed: () {
                 final isValidForm = formKey.currentState!.validate();
                 if (isValidForm) {
-                  print(_usernameController.text);
+                  print(_emailController.text);
                   print(_passController.text);
                   Navigator.push(
                     context,
