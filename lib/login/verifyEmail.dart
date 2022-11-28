@@ -1,0 +1,162 @@
+import 'dart:async';
+
+import 'package:blog_app/home%20page/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class VerifyEmail extends StatefulWidget {
+  const VerifyEmail({super.key});
+
+  @override
+  State<VerifyEmail> createState() => _VerifyEmailState();
+}
+
+class _VerifyEmailState extends State<VerifyEmail> {
+  bool isEmailVerified = false;
+  bool canResendEmail = false;
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    if (!isEmailVerified) {
+      sendVerificationEmail();
+
+      timer = Timer.periodic(
+        Duration(seconds: 3),
+        (_) => checkEmailVerified(),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  Future checkEmailVerified() async {
+    await FirebaseAuth.instance.currentUser!.reload();
+    setState(() {
+      isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    });
+    if (isEmailVerified) timer?.cancel();
+  }
+
+  Future sendVerificationEmail() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser!;
+      await user.sendEmailVerification();
+
+      setState(() => canResendEmail = false);
+      await Future.delayed(Duration(
+        seconds: 5,
+      ));
+      setState(() => canResendEmail = true);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => isEmailVerified
+      ? Home()
+      : Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/blog3.png',
+                    height: 80,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "We have sent you an email.",
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Please verify your account.",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white54,
+                      fontSize: 15,
+                      height: .9,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  resentVerification(),
+                  GestureDetector(
+                    onTap: () => FirebaseAuth.instance.signOut(),
+                    child: Text(
+                      'Cancel',
+                      style: GoogleFonts.poppins(
+                        height: 3,
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+  Widget resentVerification() => Row(
+        children: [
+          Expanded(
+            child: TextButton(
+              onPressed: () {
+                canResendEmail
+                    ? sendVerificationEmail()
+                    : ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Please wait for a few second for another verification email. Thank you!'),
+                        ),
+                      );
+                ;
+              },
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                backgroundColor: Colors.blueAccent,
+                side: const BorderSide(
+                  width: .5,
+                  color: Colors.black38,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.email_outlined,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    ' Resent Email',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+}

@@ -321,10 +321,18 @@ class _RegisterState extends State<Register> {
         error = "";
       });
     } on FirebaseAuthException catch (e) {
-      print(e);
       setState(() {
         error = e.message.toString();
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 5),
+          content: Text(
+            error,
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+      );
     }
     Navigator.pop(context);
   }

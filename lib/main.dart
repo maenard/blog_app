@@ -1,5 +1,6 @@
 import 'package:blog_app/home%20page/home.dart';
 import 'package:blog_app/login/login.dart';
+import 'package:blog_app/login/verifyEmail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
               child: Text('Something went wrong!'),
             );
           } else if (snapshot.hasData) {
-            return Home();
+            return VerifyEmail();
           } else {
             return Login();
           }

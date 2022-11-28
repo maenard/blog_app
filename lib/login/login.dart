@@ -1,4 +1,5 @@
 import 'package:blog_app/home%20page/home.dart';
+import 'package:blog_app/login/forgotPassword.dart';
 import 'package:blog_app/main.dart';
 import 'package:blog_app/login/register.dart';
 import 'package:email_validator/email_validator.dart';
@@ -58,7 +59,7 @@ class _LoginState extends State<Login> {
                 _divider(20),
                 loginForm(),
                 _divider(20),
-                errorMsg(),
+                // errorMsg(),
                 Expanded(
                   child: Align(
                     alignment: Alignment.bottomCenter,
@@ -165,7 +166,13 @@ class _LoginState extends State<Login> {
   Widget forgotPass() => Expanded(
         child: GestureDetector(
           onTap: () {
-            print('Give me my password!');
+            // print('Give me my password!');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ForgotPassword(),
+              ),
+            );
           },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -387,6 +394,15 @@ class _LoginState extends State<Login> {
       setState(() {
         error = e.message.toString();
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 5),
+          content: Text(
+            error,
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+      );
     }
     Navigator.pop(context);
   }
