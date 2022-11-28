@@ -174,7 +174,7 @@ class _LoginState extends State<Login> {
               Text(
                 "Forgot",
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: Colors.white54,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   height: 1,
@@ -183,7 +183,7 @@ class _LoginState extends State<Login> {
               Text(
                 "Password?",
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: Colors.white54,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   height: 1,

@@ -18,7 +18,10 @@ class _HomeState extends State<Home> {
       appBar: customAppBar(),
       body: SafeArea(
         child: Center(
-          child: Text('Home'),
+          child: TextButton(
+            onPressed: () => FirebaseAuth.instance.signOut(),
+            child: Text('Signout bitc'),
+          ),
         ),
       ),
     );
@@ -68,12 +71,10 @@ class _HomeState extends State<Home> {
           );
         },
         child: Ink(
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.all(13),
             child: ClipOval(
-              child: Image(
-                image: AssetImage('assets/images/photo_male_7.jpg'),
-              ),
+              child: Image.asset("assets/images/photo_male_7.jpg"),
             ),
           ),
         ),

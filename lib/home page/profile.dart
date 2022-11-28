@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,7 +16,7 @@ class _ProfileState extends State<Profile> {
       appBar: customAppBar(),
       body: SafeArea(
         child: ListView(
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -31,6 +32,10 @@ class _ProfileState extends State<Profile> {
                 spacing(20, 0),
                 userAbout(),
                 userPost(),
+                TextButton(
+                  onPressed: () => FirebaseAuth.instance.signOut(),
+                  child: Text('Signout bitc'),
+                ),
               ],
             ),
           ],
@@ -66,7 +71,7 @@ class _ProfileState extends State<Profile> {
             spacing(10, 0),
             Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   backgroundImage: AssetImage(
                     'assets/images/photo_male_7.jpg',
                   ),
@@ -109,7 +114,7 @@ class _ProfileState extends State<Profile> {
               ],
             ),
             Row(
-              children: [
+              children: const [
                 Flexible(
                   child: Text(
                       "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."),

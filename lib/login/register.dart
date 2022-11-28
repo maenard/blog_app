@@ -1,4 +1,7 @@
+import 'package:blog_app/model/users.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,11 +16,27 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   final formKey = GlobalKey<FormState>();
   late bool _isNotVisible;
+  late TextEditingController namecontroller;
+  late TextEditingController passcontroller;
+  late TextEditingController emailcontroller;
+  late String error;
 
   @override
   void initState() {
     super.initState();
     _isNotVisible = true;
+    namecontroller = TextEditingController();
+    passcontroller = TextEditingController();
+    emailcontroller = TextEditingController();
+    error = "";
+  }
+
+  @override
+  void dispose() {
+    namecontroller.dispose();
+    passcontroller.dispose();
+    emailcontroller.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,52 +70,51 @@ class _RegisterState extends State<Register> {
                       return null;
                     }
                   },
+                  namecontroller,
                 ),
                 spacing(15, 0),
                 formControl(
-                  'Password',
-                  _isNotVisible,
-                  _isNotVisible
-                      ? SizedBox(
-                          width: 20,
-                          height: 50,
-                          child: IconButton(
-                            padding: EdgeInsets.all(0),
-                            splashRadius: 30,
-                            onPressed: () {
-                              setState(() {
-                                _isNotVisible = !_isNotVisible;
-                              });
-                            },
-                            icon: const Icon(
-                              Icons.key,
+                    'Password',
+                    _isNotVisible,
+                    _isNotVisible
+                        ? SizedBox(
+                            width: 20,
+                            height: 50,
+                            child: IconButton(
+                              padding: EdgeInsets.all(0),
+                              splashRadius: 30,
+                              onPressed: () {
+                                setState(() {
+                                  _isNotVisible = !_isNotVisible;
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.key,
+                              ),
                             ),
-                          ),
-                        )
-                      : SizedBox(
-                          width: 20,
-                          height: 50,
-                          child: IconButton(
-                            padding: EdgeInsets.all(0),
-                            splashRadius: 30,
-                            onPressed: () {
-                              setState(() {
-                                _isNotVisible = !_isNotVisible;
-                              });
-                            },
-                            icon: const Icon(
-                              Icons.key_off,
+                          )
+                        : SizedBox(
+                            width: 20,
+                            height: 50,
+                            child: IconButton(
+                              padding: EdgeInsets.all(0),
+                              splashRadius: 30,
+                              onPressed: () {
+                                setState(() {
+                                  _isNotVisible = !_isNotVisible;
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.key_off,
+                              ),
                             ),
-                          ),
-                        ),
-                  (pass) {
-                    if (pass != null && pass.length < 7) {
-                      return 'Enter minimum 7 characters';
-                    } else {
-                      null;
-                    }
-                  },
-                ),
+                          ), (pass) {
+                  if (pass != null && pass.length < 7) {
+                    return 'Enter minimum 7 characters';
+                  } else {
+                    null;
+                  }
+                }, passcontroller),
                 spacing(15, 0),
                 formControl(
                   'Email',
@@ -109,6 +127,7 @@ class _RegisterState extends State<Register> {
                       null;
                     }
                   },
+                  emailcontroller,
                 ),
                 spacing(15, 0),
                 Expanded(
@@ -208,10 +227,16 @@ class _RegisterState extends State<Register> {
             child: TextButton(
               onPressed: () {
                 final isValidForm = formKey.currentState!.validate();
-                if (isValidForm) {}
+                if (isValidForm) {
+                  registerUser();
+                  // print(namecontroller);
+                  // print(passcontroller);
+                  // print(emailcontroller);
+                }
               },
               style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -234,8 +259,10 @@ class _RegisterState extends State<Register> {
         ],
       );
 
-  Widget formControl(String text, bool invisibility, icon, validator) =>
+  Widget formControl(
+          String text, bool invisibility, icon, validator, controller) =>
       TextFormField(
+        controller: controller,
         obscureText: invisibility,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
@@ -247,7 +274,7 @@ class _RegisterState extends State<Register> {
             fontStyle: FontStyle.italic,
           ),
           suffixIcon: Padding(
-            padding: EdgeInsets.only(right: 20),
+            padding: const EdgeInsets.only(right: 20),
             child: icon,
           ),
           hintText: text,
@@ -272,15 +299,52 @@ class _RegisterState extends State<Register> {
         'assets/images/blog3.png',
         height: 80,
       );
-  // Widget backIcon() => Row(
-  //       mainAxisAlignment: MainAxisAlignment.start,
-  //       children: [
-  //         IconButton(
-  //           onPressed: () {
-  //             Navigator.pop(context);
-  //           },
-  //           icon: const Icon(Icons.arrow_back_rounded),
-  //         ),
-  //       ],
-  //     );
+
+  Future registerUser() async {
+    showDialog(
+      context: context,
+      useRootNavigator: false,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailcontroller.text.trim(),
+        password: passcontroller.text.trim(),
+      );
+      createUser();
+
+      setState(() {
+        error = "";
+      });
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      setState(() {
+        error = e.message.toString();
+      });
+    }
+    Navigator.pop(context);
+  }
+
+  Future createUser() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final userid = user.uid;
+
+    final docUser = FirebaseFirestore.instance.collection('users').doc(userid);
+
+    final newUser = Users(
+      id: userid,
+      password: passcontroller.text,
+      email: emailcontroller.text,
+      name: namecontroller.text,
+    );
+
+    final json = newUser.toJson();
+    await docUser.set(json);
+
+    Navigator.pop(context);
+  }
 }
