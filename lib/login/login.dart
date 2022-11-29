@@ -43,6 +43,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Form(
         key: logInKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -136,16 +137,6 @@ class _LoginState extends State<Login> {
         ],
       );
 
-  // Widget signUp() => Column(
-  //       mainAxisAlignment: MainAxisAlignment.end,
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         _loginbtn(),
-  //         register(),
-  //         _divider(5),
-  //       ],
-  //     );
-
   Widget loginForm() => Column(
         children: [
           emailField(),
@@ -166,7 +157,6 @@ class _LoginState extends State<Login> {
   Widget forgotPass() => Expanded(
         child: GestureDetector(
           onTap: () {
-            // print('Give me my password!');
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -216,15 +206,8 @@ class _LoginState extends State<Login> {
           ),
           border: OutlineInputBorder(
             borderSide: BorderSide.none,
-            // borderSide: const BorderSide(
-            //   color: Colors.transparent,
-            // ),
             borderRadius: BorderRadius.circular(20),
           ),
-          // focusedBorder: const OutlineInputBorder(
-          //   borderSide: BorderSide(color: Colors.blueAccent),
-          //   borderRadius: BorderRadius.all(Radius.circular(10)),
-          // ),
           errorStyle: GoogleFonts.poppins(
             height: 0,
             fontStyle: FontStyle.italic,

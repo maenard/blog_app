@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:blog_app/home%20page/home.dart';
+import 'package:blog_app/home%20page/navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,8 +63,9 @@ class _VerifyEmailState extends State<VerifyEmail> {
 
   @override
   Widget build(BuildContext context) => isEmailVerified
-      ? Home()
+      ? Navigation()
       : Scaffold(
+          backgroundColor: Colors.black,
           body: Center(
             child: Padding(
               padding: const EdgeInsets.all(20),

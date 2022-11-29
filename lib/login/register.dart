@@ -42,6 +42,7 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Form(
         key: formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -229,9 +230,6 @@ class _RegisterState extends State<Register> {
                 final isValidForm = formKey.currentState!.validate();
                 if (isValidForm) {
                   registerUser();
-                  // print(namecontroller);
-                  // print(passcontroller);
-                  // print(emailcontroller);
                 }
               },
               style: TextButton.styleFrom(
@@ -267,7 +265,7 @@ class _RegisterState extends State<Register> {
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
           filled: true,
-          fillColor: Colors.white10,
+          fillColor: Colors.white12,
           errorStyle: GoogleFonts.poppins(
             fontSize: 12,
             height: 0,
