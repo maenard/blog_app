@@ -120,7 +120,14 @@ class _ProfileState extends State<Profile> {
                       constraints: BoxConstraints(),
                       splashRadius: 20,
                       onPressed: () {},
-                      icon: Icon(Icons.star_outline),
+                      icon: Icon(Icons.edit_note_rounded),
+                    ),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                      splashRadius: 20,
+                      onPressed: () {},
+                      icon: Icon(Icons.delete_outline_rounded),
                     )
                   ],
                 ),
@@ -136,7 +143,7 @@ class _ProfileState extends State<Profile> {
                           fontSize: 13,
                           height: 1.5,
                         ),
-                        textAlign: TextAlign.justify,
+                        textAlign: TextAlign.start,
                       ),
                     ),
                   ],
@@ -147,12 +154,21 @@ class _ProfileState extends State<Profile> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    IconButton(
+                      onPressed: () {},
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                      splashRadius: 20,
+                      icon: Icon(
+                        Icons.star_border,
+                        size: 18,
+                      ),
+                    ),
                     Text(
-                      '1k Stars',
+                      ' 1k Stars',
                       style: GoogleFonts.poppins(
                         color: Colors.white54,
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
                       ),
                     )
                   ],

@@ -129,7 +129,6 @@ class _HomeState extends State<Home> {
                           fontSize: 13,
                           height: 1.5,
                         ),
-                        textAlign: TextAlign.justify,
                       ),
                     ),
                   ],
