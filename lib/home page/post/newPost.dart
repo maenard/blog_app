@@ -1,3 +1,4 @@
+import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NewPost extends StatefulWidget {
-  const NewPost({super.key});
+  const NewPost({
+    super.key,
+  });
 
   @override
   State<NewPost> createState() => _NewPostState();
@@ -14,11 +17,13 @@ class NewPost extends StatefulWidget {
 class _NewPostState extends State<NewPost> {
   final user = FirebaseAuth.instance.currentUser!;
   late TextEditingController postcontroller;
+  late String curruserName;
 
   @override
   void initState() {
     super.initState();
     postcontroller = TextEditingController();
+    curruserName = "";
   }
 
   @override
@@ -41,9 +46,29 @@ class _NewPostState extends State<NewPost> {
         actions: [
           IconButton(
             onPressed: () {
-              setState(() {
-                print(postcontroller.text);
-              });
+              if (postcontroller.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 5),
+                    content: Text(
+                      "Your post is empty!",
+                      style: GoogleFonts.poppins(),
+                    ),
+                  ),
+                );
+              } else {
+                addBlog();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 5),
+                    content: Text(
+                      "Blog Added Successfuly!",
+                      style: GoogleFonts.poppins(),
+                    ),
+                  ),
+                );
+                Navigator.pop(context);
+              }
             },
             icon: const Icon(Icons.post_add),
           ),
@@ -55,21 +80,23 @@ class _NewPostState extends State<NewPost> {
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              postField(),
-            ],
+            children: [readCurrentUser(user.uid)],
           ),
         ),
       ),
     );
   }
 
-  Widget postField() => Column(
+  Widget postField(Users user) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          readCurrentUser(user.uid),
+          userInfo(user),
           TextField(
             onChanged: (value) => {
+              setState(() {
+                curruserName = user.name;
+              }),
+              print(curruserName),
               if (postcontroller.text.isEmpty)
                 {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -80,7 +107,7 @@ class _NewPostState extends State<NewPost> {
                         style: GoogleFonts.poppins(),
                       ),
                     ),
-                  )
+                  ),
                 }
               else
                 {}
@@ -115,7 +142,7 @@ class _NewPostState extends State<NewPost> {
   Widget userInfo(Users user) => Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
           ),
           const SizedBox(
@@ -130,6 +157,25 @@ class _NewPostState extends State<NewPost> {
           ),
         ],
       );
+
+  Future addBlog() async {
+    final docUser = FirebaseFirestore.instance.collection('blogs').doc();
+
+    final newUser = Blogs(
+      postId: docUser.id,
+      userId: user.uid,
+      content: postcontroller.text,
+      datePosted: DateTime.now().toString(),
+      name: curruserName,
+    );
+
+    final json = newUser.toJson();
+    await docUser.set(json);
+
+    setState(() {
+      postcontroller.text = "";
+    });
+  }
 
   Widget readCurrentUser(uid) {
     var collection = FirebaseFirestore.instance.collection('users');
@@ -148,10 +194,8 @@ class _NewPostState extends State<NewPost> {
                 password: users['password'],
                 email: users['email'],
               );
-
-              return (userInfo(newUser));
+              return (postField(newUser));
             }
-
             return const Center(child: CircularProgressIndicator());
           },
         ),

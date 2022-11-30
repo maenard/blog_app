@@ -148,7 +148,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                     color: Colors.white,
                   ),
                   Text(
-                    ' Resent Email',
+                    ' Resend Email',
                     style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

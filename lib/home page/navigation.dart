@@ -15,9 +15,9 @@ class _NavigationState extends State<Navigation> {
   final currentUser = FirebaseAuth.instance.currentUser!;
   int navBarIndex = 1;
   List<Widget> pages = [
-    UserNotif(),
-    Home(),
     Profile(),
+    Home(),
+    UserNotif(),
   ];
 
   @override
@@ -32,12 +32,15 @@ class _NavigationState extends State<Navigation> {
         backgroundColor: Colors.black,
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.notifications_active_outlined),
-            selectedIcon: Icon(
-              Icons.notifications,
-              color: Colors.blueAccent,
+            icon: CircleAvatar(
+              backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
+              radius: 15,
             ),
-            label: 'Notifications',
+            selectedIcon: CircleAvatar(
+              backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
+              radius: 15,
+            ),
+            label: 'Profile',
           ),
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -48,15 +51,12 @@ class _NavigationState extends State<Navigation> {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: CircleAvatar(
-              backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
-              radius: 15,
+            icon: Icon(Icons.notifications_active_outlined),
+            selectedIcon: Icon(
+              Icons.notifications,
+              color: Colors.blueAccent,
             ),
-            selectedIcon: CircleAvatar(
-              backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
-              radius: 15,
-            ),
-            label: 'Profile',
+            label: 'Notifications',
           ),
         ],
       ),
