@@ -1,3 +1,4 @@
+import 'package:blog_app/home%20page/post/editPost.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
 import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/users.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:sweetsheet/sweetsheet.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -16,14 +18,13 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final user = FirebaseAuth.instance.currentUser!;
+  final SweetSheet dialog = SweetSheet();
   late String currUserName;
-  late String userId;
 
   @override
   void initState() {
     super.initState();
     currUserName = "";
-    userId = "";
   }
 
   @override
@@ -121,15 +122,60 @@ class _ProfileState extends State<Profile> {
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       splashRadius: 20,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditPost(blogs: blogs),
+                          ),
+                        );
+                      },
                       icon: const Icon(Icons.edit_note_rounded),
                     ),
                     IconButton(
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       splashRadius: 20,
-                      onPressed: () {},
-                      icon: Icon(Icons.delete_outline_rounded),
+                      onPressed: () {
+                        dialog.show(
+                          icon: Icons.delete,
+                          context: context,
+                          title: Text(
+                            'Are you sure?',
+                            style: GoogleFonts.poppins(),
+                          ),
+                          description: Text(
+                            'This blog will be deleted. You can not undo these changes.',
+                            style: GoogleFonts.poppins(),
+                          ),
+                          color: SweetSheetColor.DANGER,
+                          negative: SweetSheetAction(
+                            title: 'Cancel',
+                            icon: Icons.close,
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          positive: SweetSheetAction(
+                            title: 'Yes',
+                            icon: Icons.check,
+                            onPressed: () {
+                              deleteBlog(blogs.postId);
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  duration: const Duration(seconds: 5),
+                                  content: Text(
+                                    "Your post is deleted!",
+                                    style: GoogleFonts.poppins(),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.delete_outline_rounded),
                     )
                   ],
                 ),
@@ -349,6 +395,11 @@ class _ProfileState extends State<Profile> {
           ],
         ),
       );
+
+  deleteBlog(id) {
+    final docUser = FirebaseFirestore.instance.collection('blogs').doc(id);
+    docUser.delete();
+  }
 
   Widget readCurrentUser(uid) {
     var collection = FirebaseFirestore.instance.collection('users');

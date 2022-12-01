@@ -111,24 +111,12 @@ class _NewPostState extends State<NewPost> {
             scrollPadding: const EdgeInsets.only(bottom: 50),
             controller: postcontroller,
             decoration: InputDecoration(
-              // contentPadding:
-              //     const EdgeInsets.only(left: 20, top: 10, bottom: 10),
-              // filled: true,
-              // fillColor: Colors.white10,
               hintText: 'What\'s on your mind?',
               hintStyle: GoogleFonts.poppins(),
-              // suffixIcon: const Padding(
-              //   padding: EdgeInsets.only(right: 20),
-              //   child: Icon(Icons.email_outlined),
-              // ),
               border: OutlineInputBorder(
                 borderSide: BorderSide.none,
                 borderRadius: BorderRadius.circular(20),
               ),
-              // errorStyle: GoogleFonts.poppins(
-              //   height: 0,
-              //   fontStyle: FontStyle.italic,
-              // ),
             ),
           ),
         ],
