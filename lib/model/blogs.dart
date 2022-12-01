@@ -3,14 +3,12 @@ class Blogs {
   final userId;
   final content;
   final datePosted;
-  final name;
 
   Blogs({
     required this.postId,
     required this.userId,
     required this.content,
     required this.datePosted,
-    required this.name,
   });
 
   Map<String, dynamic> toJson() => {
@@ -18,7 +16,6 @@ class Blogs {
         'userId': userId,
         'content': content,
         'datePosted': datePosted,
-        'name': name,
       };
 
   static Blogs fromJson(Map<String, dynamic> json) => Blogs(
@@ -26,6 +23,5 @@ class Blogs {
         userId: json['userId'],
         content: json['content'],
         datePosted: json['datePosted'],
-        name: json['name'],
       );
 }

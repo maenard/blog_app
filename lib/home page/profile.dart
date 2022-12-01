@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -98,7 +99,7 @@ class _ProfileState extends State<Profile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          blogs.name,
+                          blogs.userId,
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -106,7 +107,8 @@ class _ProfileState extends State<Profile> {
                           overflow: TextOverflow.clip,
                         ),
                         Text(
-                          blogs.datePosted,
+                          DateFormat('MMM. dd, yyyy | EEE.')
+                              .format(blogs.datePosted.toDate()),
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             height: 1.2,
@@ -117,14 +119,14 @@ class _ProfileState extends State<Profile> {
                     const Expanded(child: SizedBox()),
                     IconButton(
                       padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
+                      constraints: const BoxConstraints(),
                       splashRadius: 20,
                       onPressed: () {},
-                      icon: Icon(Icons.edit_note_rounded),
+                      icon: const Icon(Icons.edit_note_rounded),
                     ),
                     IconButton(
                       padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
+                      constraints: const BoxConstraints(),
                       splashRadius: 20,
                       onPressed: () {},
                       icon: Icon(Icons.delete_outline_rounded),
@@ -378,6 +380,7 @@ class _ProfileState extends State<Profile> {
   Stream<List<Blogs>> readPosts() => FirebaseFirestore.instance
       .collection('blogs')
       .where("userId", isEqualTo: user.uid)
+      .orderBy("datePosted", descending: true)
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => Blogs.fromJson(doc.data())).toList());

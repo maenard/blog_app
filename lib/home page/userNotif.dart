@@ -1,3 +1,4 @@
+import 'package:blog_app/model/users.dart';
 import 'package:flutter/material.dart';
 
 class UserNotif extends StatefulWidget {

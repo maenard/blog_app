@@ -91,7 +91,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          blogs.name,
+                          blogs.userId,
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -99,7 +99,8 @@ class _HomeState extends State<Home> {
                           overflow: TextOverflow.clip,
                         ),
                         Text(
-                          blogs.datePosted,
+                          DateFormat('MMM. dd, yyyy | EEE.')
+                              .format(blogs.datePosted.toDate()),
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             height: 1.2,
@@ -264,53 +265,9 @@ class _HomeState extends State<Home> {
         ],
       );
 
-  appBarActions() => Row(
-        children: [
-          IconButton(
-            splashRadius: 20,
-            onPressed: () {},
-            icon: Icon(Icons.search),
-          ),
-          IconButton(
-            splashRadius: 20,
-            onPressed: () {},
-            icon: Badge(
-              padding: EdgeInsets.all(3),
-              animationType: BadgeAnimationType.fade,
-              position: BadgePosition.topEnd(
-                top: -8,
-                end: -3,
-              ),
-              badgeContent: Text(
-                '69',
-                style: GoogleFonts.poppins(
-                  fontSize: 9,
-                ),
-              ),
-              child: Icon(Icons.notifications_none),
-            ),
-          ),
-        ],
-      );
-
-  customAppBar() => AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.grey.shade900,
-        actions: [
-          appBarActions(),
-        ],
-        elevation: 0,
-        title: Text(
-          '.blog',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        titleSpacing: 15,
-      );
-
   Stream<List<Blogs>> readPosts() => FirebaseFirestore.instance
       .collection('blogs')
+      .orderBy("datePosted", descending: true)
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => Blogs.fromJson(doc.data())).toList());
@@ -335,7 +292,6 @@ class _HomeState extends State<Home> {
 
               return (userGreeting(newUser));
             }
-
             return const Center(child: CircularProgressIndicator());
           },
         ),

@@ -17,13 +17,12 @@ class NewPost extends StatefulWidget {
 class _NewPostState extends State<NewPost> {
   final user = FirebaseAuth.instance.currentUser!;
   late TextEditingController postcontroller;
-  late String curruserName;
+  late Users currentUserInfo;
 
   @override
   void initState() {
     super.initState();
     postcontroller = TextEditingController();
-    curruserName = "";
   }
 
   @override
@@ -49,7 +48,7 @@ class _NewPostState extends State<NewPost> {
               if (postcontroller.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    duration: Duration(seconds: 5),
+                    duration: const Duration(seconds: 5),
                     content: Text(
                       "Your post is empty!",
                       style: GoogleFonts.poppins(),
@@ -60,7 +59,7 @@ class _NewPostState extends State<NewPost> {
                 addBlog();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    duration: Duration(seconds: 5),
+                    duration: const Duration(seconds: 5),
                     content: Text(
                       "Blog Added Successfuly!",
                       style: GoogleFonts.poppins(),
@@ -77,7 +76,7 @@ class _NewPostState extends State<NewPost> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [readCurrentUser(user.uid)],
@@ -93,15 +92,11 @@ class _NewPostState extends State<NewPost> {
           userInfo(user),
           TextField(
             onChanged: (value) => {
-              setState(() {
-                curruserName = user.name;
-              }),
-              print(curruserName),
               if (postcontroller.text.isEmpty)
                 {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      duration: Duration(seconds: 5),
+                      duration: const Duration(seconds: 5),
                       content: Text(
                         "Please fill out this field",
                         style: GoogleFonts.poppins(),
@@ -149,7 +144,7 @@ class _NewPostState extends State<NewPost> {
             width: 10,
           ),
           Text(
-            user.name,
+            currentUserInfo.name,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
               fontSize: 15,
@@ -160,13 +155,11 @@ class _NewPostState extends State<NewPost> {
 
   Future addBlog() async {
     final docUser = FirebaseFirestore.instance.collection('blogs').doc();
-
     final newUser = Blogs(
       postId: docUser.id,
       userId: user.uid,
       content: postcontroller.text,
-      datePosted: DateTime.now().toString(),
-      name: curruserName,
+      datePosted: DateTime.now(),
     );
 
     final json = newUser.toJson();
@@ -194,6 +187,7 @@ class _NewPostState extends State<NewPost> {
                 password: users['password'],
                 email: users['email'],
               );
+              currentUserInfo = newUser;
               return (postField(newUser));
             }
             return const Center(child: CircularProgressIndicator());
