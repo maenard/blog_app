@@ -263,7 +263,7 @@ class _RegisterState extends State<Register> {
         controller: controller,
         obscureText: invisibility,
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
+          contentPadding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
           filled: true,
           fillColor: Colors.white12,
           errorStyle: GoogleFonts.poppins(
@@ -346,6 +346,8 @@ class _RegisterState extends State<Register> {
       password: passcontroller.text,
       email: emailcontroller.text,
       name: namecontroller.text,
+      userProfilePic: '-',
+      userProfileCover: '-',
     );
 
     final json = newUser.toJson();

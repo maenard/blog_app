@@ -3,12 +3,16 @@ class Users {
   final name;
   final password;
   final email;
+  final userProfilePic;
+  final userProfileCover;
 
   Users({
     required this.id,
     required this.name,
     required this.password,
     required this.email,
+    required this.userProfilePic,
+    required this.userProfileCover,
   });
 
   Map<String, dynamic> toJson() => {
@@ -16,6 +20,8 @@ class Users {
         'name': name,
         'password': password,
         'email': email,
+        'userProfilePic': userProfilePic,
+        'userProfileCover': userProfileCover,
       };
 
   static Users fromJson(Map<String, dynamic> json) => Users(
@@ -23,5 +29,7 @@ class Users {
         name: json['name'],
         password: json['password'],
         email: json['email'],
+        userProfilePic: json['userProfilePic'],
+        userProfileCover: json['userProfileCover'],
       );
 }

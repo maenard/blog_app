@@ -43,31 +43,51 @@ class _ProfileState extends State<Profile> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            readCurrentUser(user.uid),
-            const SizedBox(
-              height: 10,
-            ),
-            addPost(),
-            StreamBuilder<List<Blogs>>(
-              stream: readPosts(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Text('Something went wrong! ${snapshot.error}');
-                } else if (snapshot.hasData) {
-                  final blogs = snapshot.data!;
-                  return Column(
-                    children: blogs.map(userPost).toList(),
-                  );
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  );
-                }
-              },
-            ),
+            fetchUserProfile(),
+            fetchUserBlogs(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget fetchUserProfile() {
+    return StreamBuilder<List<Users>>(
+      stream: readUserProfile(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong! ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final _user = snapshot.data!;
+          return Column(
+            children: _user.map(userProfile).toList(),
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+      },
+    );
+  }
+
+  Widget fetchUserBlogs() {
+    return StreamBuilder<List<Blogs>>(
+      stream: readPosts(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong! ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final blogs = snapshot.data!;
+          return Column(
+            children: blogs.map(userPost).toList(),
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+      },
     );
   }
 
@@ -90,8 +110,9 @@ class _ProfileState extends State<Profile> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                      backgroundImage:
-                          AssetImage("assets/images/photo_male_7.jpg"),
+                      backgroundImage: blogs.authorPic == "-"
+                          ? imgNotExist()
+                          : imgExist(blogs.authorPic),
                     ),
                     const SizedBox(
                       width: 10,
@@ -100,7 +121,7 @@ class _ProfileState extends State<Profile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          blogs.userId,
+                          blogs.authorName,
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -227,7 +248,17 @@ class _ProfileState extends State<Profile> {
         ],
       );
 
-  Widget addPost() => Container(
+  Widget userProfile(Users newUser) => Column(
+        children: [
+          userDetail(newUser),
+          const SizedBox(
+            height: 10,
+          ),
+          addPost(newUser),
+        ],
+      );
+
+  addPost(Users newUser) => Container(
         color: Colors.white10,
         padding: const EdgeInsets.all(20),
         width: MediaQuery.of(context).size.width,
@@ -252,16 +283,18 @@ class _ProfileState extends State<Profile> {
                 ),
               ],
             ),
-            postField(currUserName),
+            postField(newUser),
           ],
         ),
       );
 
-  Widget postField(String currUserName) => Row(
+  postField(Users newUser) => Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const CircleAvatar(
-            backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
+          CircleAvatar(
+            backgroundImage: newUser.userProfilePic == "-"
+                ? imgNotExist()
+                : imgExist(newUser.userProfilePic),
             radius: 18,
           ),
           const SizedBox(
@@ -274,7 +307,9 @@ class _ProfileState extends State<Profile> {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: ((context) => NewPost()),
+                    builder: ((context) => NewPost(
+                          newUser: newUser,
+                        )),
                   ),
                 ),
                 readOnly: true,
@@ -305,70 +340,48 @@ class _ProfileState extends State<Profile> {
         ],
       );
 
-  Widget userStats() => IntrinsicHeight(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '150',
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Posts',
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    // fontWeight: FontWeight.w400,
-                    height: .9,
-                  ),
-                ),
-              ],
-            ),
-            const VerticalDivider(
-              color: Colors.white,
-              indent: 4,
-              endIndent: 4,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '50',
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Stars',
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    // fontWeight: FontWeight.w400,
-                    height: .9,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
+  imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
+  imgExist(img) => NetworkImage(img);
 
-  Widget userDetail(Users newUser) => Container(
+  userDetail(Users newUser) => Container(
         color: Colors.white10,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.only(bottom: 20),
         width: MediaQuery.of(context).size.width,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              backgroundImage: AssetImage("assets/images/photo_male_7.jpg"),
-              radius: 70,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 70),
+              child: Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  newUser.userProfileCover == "-"
+                      ? Container(
+                          color: Colors.white12,
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height * .30,
+                        )
+                      : Container(
+                          color: Colors.white12,
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height * .30,
+                          child: FittedBox(
+                            fit: BoxFit.fill,
+                            child: Image.network(newUser.userProfileCover),
+                          ),
+                        ),
+                  Positioned(
+                    bottom: -70,
+                    child: CircleAvatar(
+                      backgroundImage: newUser.userProfilePic == "-"
+                          ? imgNotExist()
+                          : imgExist(newUser.userProfilePic),
+                      radius: 70,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(
               height: 10,
@@ -384,14 +397,10 @@ class _ProfileState extends State<Profile> {
               newUser.email,
               style: GoogleFonts.poppins(
                 color: Colors.white54,
-                fontSize: 12,
-                height: .8,
+                fontSize: 15,
+                height: .9,
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            userStats(),
           ],
         ),
       );
@@ -401,33 +410,6 @@ class _ProfileState extends State<Profile> {
     docUser.delete();
   }
 
-  Widget readCurrentUser(uid) {
-    var collection = FirebaseFirestore.instance.collection('users');
-    return Column(
-      children: [
-        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: collection.doc(uid).snapshots(),
-          builder: (_, snapshot) {
-            if (snapshot.hasError) return Text('Error = ${snapshot.error}');
-
-            if (snapshot.hasData) {
-              final users = snapshot.data!.data();
-              final newUser = Users(
-                id: users!['id'],
-                name: users['name'],
-                password: users['password'],
-                email: users['email'],
-              );
-              return (userDetail(newUser));
-            }
-
-            return const Center(child: CircularProgressIndicator());
-          },
-        ),
-      ],
-    );
-  }
-
   Stream<List<Blogs>> readPosts() => FirebaseFirestore.instance
       .collection('blogs')
       .where("userId", isEqualTo: user.uid)
@@ -435,4 +417,12 @@ class _ProfileState extends State<Profile> {
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => Blogs.fromJson(doc.data())).toList());
+
+  Stream<List<Users>> readUserProfile() => FirebaseFirestore.instance
+      .collection('users')
+      .where("id", isEqualTo: user.uid)
+      .limit(1)
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => Users.fromJson(doc.data())).toList());
 }

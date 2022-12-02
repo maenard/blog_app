@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:blog_app/home%20page/home.dart';
 import 'package:blog_app/home%20page/navigation.dart';
+import 'package:blog_app/model/users.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

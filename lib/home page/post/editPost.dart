@@ -81,7 +81,9 @@ class _EditPostState extends State<EditPost> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [readCurrentUser(user.uid)],
+            children: [
+              readCurrentUser(user.uid),
+            ],
           ),
         ),
       ),
@@ -124,17 +126,22 @@ class _EditPostState extends State<EditPost> {
         ],
       );
 
-  Widget userInfo(Users user) => Row(
+  imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
+  imgExist(img) => NetworkImage(img);
+
+  Widget userInfo(Users newUser) => Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const CircleAvatar(
-            backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
+          CircleAvatar(
+            backgroundImage: newUser.userProfilePic == "-"
+                ? imgNotExist()
+                : imgExist(newUser.userProfilePic),
           ),
           const SizedBox(
             width: 10,
           ),
           Text(
-            currentUserInfo.name,
+            newUser.name,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
               fontSize: 15,
@@ -168,6 +175,8 @@ class _EditPostState extends State<EditPost> {
                 name: users['name'],
                 password: users['password'],
                 email: users['email'],
+                userProfilePic: users['userProfilePic'],
+                userProfileCover: users['userProfileCover'],
               );
               currentUserInfo = newUser;
               return (postField(newUser));

@@ -8,7 +8,10 @@ import 'package:google_fonts/google_fonts.dart';
 class NewPost extends StatefulWidget {
   const NewPost({
     super.key,
+    required this.newUser,
   });
+
+  final Users newUser;
 
   @override
   State<NewPost> createState() => _NewPostState();
@@ -79,7 +82,9 @@ class _NewPostState extends State<NewPost> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [readCurrentUser(user.uid)],
+            children: [
+              postField(widget.newUser),
+            ],
           ),
         ),
       ),
@@ -122,17 +127,22 @@ class _NewPostState extends State<NewPost> {
         ],
       );
 
+  imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
+  imgExist(img) => NetworkImage(img);
+
   Widget userInfo(Users user) => Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const CircleAvatar(
-            backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
+          CircleAvatar(
+            backgroundImage: user.userProfilePic == "-"
+                ? imgNotExist()
+                : imgExist(user.userProfilePic),
           ),
           const SizedBox(
             width: 10,
           ),
           Text(
-            currentUserInfo.name,
+            widget.newUser.name,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
               fontSize: 15,
@@ -148,6 +158,8 @@ class _NewPostState extends State<NewPost> {
       userId: user.uid,
       content: postcontroller.text,
       datePosted: DateTime.now(),
+      authorName: widget.newUser.name,
+      authorPic: widget.newUser.userProfilePic,
     );
 
     final json = newUser.toJson();
@@ -156,32 +168,5 @@ class _NewPostState extends State<NewPost> {
     setState(() {
       postcontroller.text = "";
     });
-  }
-
-  Widget readCurrentUser(uid) {
-    var collection = FirebaseFirestore.instance.collection('users');
-    return Column(
-      children: [
-        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: collection.doc(uid).snapshots(),
-          builder: (_, snapshot) {
-            if (snapshot.hasError) return Text('Error = ${snapshot.error}');
-
-            if (snapshot.hasData) {
-              final users = snapshot.data!.data();
-              final newUser = Users(
-                id: users!['id'],
-                name: users['name'],
-                password: users['password'],
-                email: users['email'],
-              );
-              currentUserInfo = newUser;
-              return (postField(newUser));
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
-        ),
-      ],
-    );
   }
 }

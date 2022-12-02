@@ -10,7 +10,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({
+    super.key,
+  });
 
   @override
   State<Home> createState() => _HomeState();
@@ -37,30 +39,57 @@ class _HomeState extends State<Home> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              addPost(),
-              StreamBuilder<List<Blogs>>(
-                stream: readPosts(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Something went wrong! ${snapshot.error}');
-                  } else if (snapshot.hasData) {
-                    final blogs = snapshot.data!;
-                    return Column(
-                      children: blogs.map(userPost).toList(),
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                },
-              ),
+              fetchUserProfile(),
+              fetchAllBlogs(),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget fetchAllBlogs() {
+    return StreamBuilder<List<Blogs>>(
+      stream: readPosts(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong! ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final blogs = snapshot.data!;
+          return Column(
+            children: blogs.map(userPost).toList(),
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
+  }
+
+  Widget fetchUserProfile() {
+    return StreamBuilder<List<Users>>(
+      stream: readUserProfile(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong! ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final _user = snapshot.data!;
+          return Column(
+            children: _user.map(addPost).toList(),
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+      },
+    );
+  }
+
+  imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
+  imgExist(img) => NetworkImage(img);
 
   Widget userPost(Blogs blogs) => Column(
         children: [
@@ -81,8 +110,10 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                      backgroundImage:
-                          AssetImage("assets/images/photo_male_7.jpg"),
+                      backgroundImage: blogs.authorPic == "-"
+                          ? imgNotExist()
+                          : imgExist(blogs.authorPic),
+                      radius: 18,
                     ),
                     const SizedBox(
                       width: 10,
@@ -91,7 +122,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          blogs.userId,
+                          blogs.authorName,
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -156,23 +187,25 @@ class _HomeState extends State<Home> {
         ],
       );
 
-  Widget addPost() => Container(
+  Widget addPost(Users newUser) => Container(
         color: Colors.white10,
         padding: const EdgeInsets.all(20),
         width: MediaQuery.of(context).size.width,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            readCurrentUser(user.uid),
+            userGreeting(newUser),
           ],
         ),
       );
 
-  Widget postField(String currUserName) => Row(
+  Widget postField(Users newUser) => Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const CircleAvatar(
-            backgroundImage: AssetImage('assets/images/photo_male_7.jpg'),
+          CircleAvatar(
+            backgroundImage: newUser.userProfilePic == "-"
+                ? imgNotExist()
+                : imgExist(newUser.userProfilePic),
             radius: 18,
           ),
           const SizedBox(
@@ -186,12 +219,11 @@ class _HomeState extends State<Home> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: ((context) => NewPost()),
+                      builder: ((context) => NewPost(
+                            newUser: newUser,
+                          )),
                     ),
                   );
-                  setState(() {
-                    currentUserName = currUserName;
-                  });
                 },
                 readOnly: true,
                 obscureText: false,
@@ -221,7 +253,7 @@ class _HomeState extends State<Home> {
         ],
       );
 
-  Widget userGreeting(Users userInfo) => Column(
+  Widget userGreeting(Users newUser) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
@@ -238,7 +270,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Text(
-                    userInfo.name,
+                    newUser.name,
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -261,7 +293,7 @@ class _HomeState extends State<Home> {
           const SizedBox(
             height: 10,
           ),
-          postField(userInfo.name.toString()),
+          postField(newUser),
         ],
       );
 
@@ -272,30 +304,11 @@ class _HomeState extends State<Home> {
       .map((snapshot) =>
           snapshot.docs.map((doc) => Blogs.fromJson(doc.data())).toList());
 
-  Widget readCurrentUser(uid) {
-    var collection = FirebaseFirestore.instance.collection('users');
-    return Column(
-      children: [
-        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: collection.doc(uid).snapshots(),
-          builder: (_, snapshot) {
-            if (snapshot.hasError) return Text('Error = ${snapshot.error}');
-
-            if (snapshot.hasData) {
-              final users = snapshot.data!.data();
-              final newUser = Users(
-                id: users!['id'],
-                name: users['name'],
-                password: users['password'],
-                email: users['email'],
-              );
-
-              return (userGreeting(newUser));
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
-        ),
-      ],
-    );
-  }
+  Stream<List<Users>> readUserProfile() => FirebaseFirestore.instance
+      .collection('users')
+      .where("id", isEqualTo: user.uid)
+      .limit(1)
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => Users.fromJson(doc.data())).toList());
 }
