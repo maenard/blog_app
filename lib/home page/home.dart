@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
 import 'package:blog_app/home%20page/profile.dart';
 import 'package:blog_app/model/blogs.dart';
+import 'package:blog_app/model/likes.dart';
 import 'package:blog_app/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -140,13 +141,7 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     const Expanded(child: SizedBox()),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
-                      splashRadius: 20,
-                      onPressed: () {},
-                      icon: Icon(Icons.star_outline),
-                    )
+                    fetchLikes(),
                   ],
                 ),
                 const SizedBox(
@@ -185,6 +180,42 @@ class _HomeState extends State<Home> {
             ),
           ),
         ],
+      );
+
+  Widget fetchLikes() {
+    return StreamBuilder<List<Likes>>(
+      stream: readLikes(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong! ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final _user = snapshot.data!;
+          return Column(
+            children: _user.map(likeButton).toList(),
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+      },
+    );
+  }
+
+  Widget likeButton(Likes like) => IconButton(
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(),
+        splashRadius: 20,
+        onPressed: () {},
+        icon: like.isLiked == true
+            ? Icon(
+                Icons.thumb_up_sharp,
+                color: Colors.white,
+              )
+            : Icon(
+                Icons.thumb_up_sharp,
+                color: Colors.blueAccent,
+              ),
       );
 
   Widget addPost(Users newUser) => Container(
@@ -296,6 +327,12 @@ class _HomeState extends State<Home> {
           postField(newUser),
         ],
       );
+
+  Stream<List<Likes>> readLikes() => FirebaseFirestore.instance
+      .collection('likes')
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => Likes.fromJson(doc.data())).toList());
 
   Stream<List<Blogs>> readPosts() => FirebaseFirestore.instance
       .collection('blogs')
