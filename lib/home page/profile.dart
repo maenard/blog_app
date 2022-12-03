@@ -245,7 +245,7 @@ class _ProfileState extends State<Profile> {
                       size: 18,
                     ),
                     Text(
-                      ' ${blogs.likesCount.toString()}',
+                      ' ${blogs.totalComments}',
                       style: GoogleFonts.poppins(
                         color: Colors.white54,
                         fontSize: 12,

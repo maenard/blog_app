@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:sweetsheet/sweetsheet.dart';
 
 class UserComments extends StatefulWidget {
   const UserComments({
@@ -23,6 +24,7 @@ class UserComments extends StatefulWidget {
 
 class _UserCommentsState extends State<UserComments> {
   final user = FirebaseAuth.instance.currentUser!;
+  final SweetSheet dialog = SweetSheet();
   late TextEditingController commentcontroller;
 
   @override
@@ -143,7 +145,7 @@ class _UserCommentsState extends State<UserComments> {
                       width: 10,
                     ),
                     widget.users.id == comments.commenterId
-                        ? allowEditDeleteComment()
+                        ? allowEditDeleteComment(comments)
                         : Container()
                   ],
                 ),
@@ -156,30 +158,85 @@ class _UserCommentsState extends State<UserComments> {
         ],
       );
 
-  allowEditDeleteComment() {
+  allowEditDeleteComment(Comments comments) {
     return Row(
       children: [
-        Text(
-          'Edit',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontSize: 12,
-            height: 1,
+        GestureDetector(
+          onTap: () {
+            print('edit');
+          },
+          child: Text(
+            'Edit',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 12,
+              height: 1,
+            ),
           ),
         ),
         const SizedBox(
           width: 10,
         ),
-        Text(
-          'Delete',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontSize: 12,
-            height: 1,
+        GestureDetector(
+          onTap: () {
+            dialog.show(
+              icon: Icons.delete,
+              context: context,
+              title: Text(
+                'Are you sure?',
+                style: GoogleFonts.poppins(),
+              ),
+              description: Text(
+                'This comment will be deleted. You can not undo these changes.',
+                style: GoogleFonts.poppins(),
+              ),
+              color: SweetSheetColor.DANGER,
+              negative: SweetSheetAction(
+                title: 'Cancel',
+                icon: Icons.close,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              positive: SweetSheetAction(
+                title: 'Yes',
+                icon: Icons.check,
+                onPressed: () {
+                  final commentCount = widget.blogs.totalComments;
+                  final newCommentCount = commentCount - 1;
+                  deleteComment(comments.commentId);
+                  updateCommentsCount(widget.blogs.postId, newCommentCount);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: const Duration(seconds: 5),
+                      content: Text(
+                        "Your post is deleted!",
+                        style: GoogleFonts.poppins(),
+                      ),
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+              ),
+            );
+          },
+          child: Text(
+            'Delete',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 12,
+              height: 1,
+            ),
           ),
         ),
       ],
     );
+  }
+
+  deleteComment(id) {
+    final docUser = FirebaseFirestore.instance.collection('comments').doc(id);
+    docUser.delete();
   }
 
   commentField() {
@@ -219,9 +276,14 @@ class _UserCommentsState extends State<UserComments> {
           ),
           IconButton(
             onPressed: () {
-              createComment();
-              updateCommentsCount(
-                  widget.blogs.postId, widget.blogs.totalComments + 1);
+              if (commentcontroller.text.trim().isEmpty) {
+              } else {
+                final commentCount = widget.blogs.totalComments;
+                final newCommentCount = commentCount + 1;
+                createComment();
+                updateCommentsCount(widget.blogs.postId, newCommentCount);
+                Navigator.pop(context);
+              }
             },
             icon: const Icon(Icons.send),
           ),

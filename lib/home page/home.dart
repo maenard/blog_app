@@ -255,9 +255,9 @@ class _HomeState extends State<Home> {
                               Icons.message_outlined,
                               color: Colors.white54,
                             ),
-                            blogs.likesCount <= 1
+                            blogs.totalComments <= 1
                                 ? Text(
-                                    " ${blogs.likesCount} comments",
+                                    " ${blogs.totalComments} comment",
                                     style: GoogleFonts.poppins(
                                       color: Colors.white54,
                                       fontSize: 12,
@@ -265,7 +265,7 @@ class _HomeState extends State<Home> {
                                     ),
                                   )
                                 : Text(
-                                    " ${blogs.likesCount} comments",
+                                    " ${blogs.totalComments} comments",
                                     style: GoogleFonts.poppins(
                                       color: Colors.white54,
                                       fontSize: 12,
