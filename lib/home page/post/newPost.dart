@@ -22,8 +22,6 @@ class _NewPostState extends State<NewPost> {
   late TextEditingController postcontroller;
   late Users currentUserInfo;
 
-  List<String> likesList = [];
-
   @override
   void initState() {
     super.initState();
@@ -164,6 +162,7 @@ class _NewPostState extends State<NewPost> {
       authorPic: widget.newUser.userProfilePic,
       likes: [],
       likesCount: 0,
+      totalComments: 0,
     );
 
     final json = newUser.toJson();

@@ -222,11 +222,12 @@ class _ProfileState extends State<Profile> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(
                       Icons.thumb_up_sharp,
                       color: Colors.white54,
-                      size: 18,
+                      size: 17,
                     ),
                     Text(
                       ' ${blogs.likesCount.toString()}',

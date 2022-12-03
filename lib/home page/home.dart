@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart';
+import 'package:blog_app/home%20page/blogComments/userComments.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
 import 'package:blog_app/home%20page/profile.dart';
 import 'package:blog_app/model/blogs.dart';
@@ -219,7 +220,34 @@ class _HomeState extends State<Home> {
                     ),
                     Expanded(
                       child: TextButton(
-                        onPressed: null,
+                        onPressed: () {
+                          final db = FirebaseFirestore.instance;
+                          final docRef = db.collection("users").doc(user.uid);
+                          docRef.get().then(
+                            (DocumentSnapshot doc) {
+                              final data = doc.data() as Map<String, dynamic>;
+                              final newUser = Users(
+                                id: data['id'],
+                                name: data['name'],
+                                password: data['password'],
+                                email: data['email'],
+                                userProfilePic: data['userProfilePic'],
+                                userProfileCover: data['userProfileCover'],
+                              );
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserComments(
+                                    blogs: blogs,
+                                    users: newUser,
+                                  ),
+                                ),
+                              );
+                            },
+                            onError: (e) => print("Error getting document: $e"),
+                          );
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
