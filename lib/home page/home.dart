@@ -2,7 +2,6 @@ import 'package:badges/badges.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
 import 'package:blog_app/home%20page/profile.dart';
 import 'package:blog_app/model/blogs.dart';
-import 'package:blog_app/model/likes.dart';
 import 'package:blog_app/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,6 +53,7 @@ class _HomeState extends State<Home> {
       stream: readPosts(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
+          print(snapshot.error);
           return Text('Something went wrong! ${snapshot.error}');
         } else if (snapshot.hasData) {
           final blogs = snapshot.data!;
@@ -98,9 +98,10 @@ class _HomeState extends State<Home> {
             height: 10,
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 10,
+            padding: const EdgeInsets.only(
+              right: 20,
+              left: 20,
+              top: 15,
             ),
             color: Colors.white10,
             width: MediaQuery.of(context).size.width,
@@ -134,18 +135,17 @@ class _HomeState extends State<Home> {
                           DateFormat('MMM. dd, yyyy | EEE.')
                               .format(blogs.datePosted.toDate()),
                           style: GoogleFonts.poppins(
+                            color: Colors.white54,
                             fontSize: 12,
                             height: 1.2,
                           ),
                         ),
                       ],
                     ),
-                    const Expanded(child: SizedBox()),
-                    fetchLikes(),
                   ],
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 Row(
                   children: [
@@ -163,59 +163,97 @@ class _HomeState extends State<Home> {
                 const SizedBox(
                   height: 10,
                 ),
+                const Divider(
+                  height: .9,
+                ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      '1k Stars',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white54,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          if (blogs.likes!.contains(user.uid)) {
+                            final newLikes = blogs.likes;
+                            final newLikesCount = blogs.likes!.length - 1;
+                            newLikes!.remove(user.uid);
+                            updateBlog(blogs.postId, newLikes, newLikesCount);
+                          } else {
+                            final newLikes = blogs.likes;
+                            final newLikesCount = blogs.likes!.length + 1;
+                            newLikes!.add(user.uid);
+                            updateBlog(blogs.postId, newLikes, newLikesCount);
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            blogs.likes!.contains(user.uid)
+                                ? const Icon(
+                                    Icons.thumb_up_sharp,
+                                    color: Colors.blueAccent,
+                                  )
+                                : const Icon(
+                                    Icons.thumb_up_sharp,
+                                    color: Colors.white54,
+                                  ),
+                            blogs.likesCount <= 1
+                                ? Text(
+                                    " ${blogs.likesCount} like",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white54,
+                                      fontSize: 12,
+                                      // height: 3.5,
+                                    ),
+                                  )
+                                : Text(
+                                    " ${blogs.likesCount} likes",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white54,
+                                      fontSize: 12,
+                                      // height: 3.5,
+                                    ),
+                                  ),
+                          ],
+                        ),
                       ),
-                    )
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: null,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.message_outlined,
+                              color: Colors.white54,
+                            ),
+                            blogs.likesCount <= 1
+                                ? Text(
+                                    " ${blogs.likesCount} comments",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white54,
+                                      fontSize: 12,
+                                      // height: 3.5,
+                                    ),
+                                  )
+                                : Text(
+                                    " ${blogs.likesCount} comments",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white54,
+                                      fontSize: 12,
+                                      // height: 3.5,
+                                    ),
+                                  ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
         ],
-      );
-
-  Widget fetchLikes() {
-    return StreamBuilder<List<Likes>>(
-      stream: readLikes(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('Something went wrong! ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          final _user = snapshot.data!;
-          return Column(
-            children: _user.map(likeButton).toList(),
-          );
-        } else {
-          return const Center(
-            child: CircularProgressIndicator.adaptive(),
-          );
-        }
-      },
-    );
-  }
-
-  Widget likeButton(Likes like) => IconButton(
-        padding: EdgeInsets.zero,
-        constraints: BoxConstraints(),
-        splashRadius: 20,
-        onPressed: () {},
-        icon: like.isLiked == true
-            ? Icon(
-                Icons.thumb_up_sharp,
-                color: Colors.white,
-              )
-            : Icon(
-                Icons.thumb_up_sharp,
-                color: Colors.blueAccent,
-              ),
       );
 
   Widget addPost(Users newUser) => Container(
@@ -328,11 +366,13 @@ class _HomeState extends State<Home> {
         ],
       );
 
-  Stream<List<Likes>> readLikes() => FirebaseFirestore.instance
-      .collection('likes')
-      .snapshots()
-      .map((snapshot) =>
-          snapshot.docs.map((doc) => Likes.fromJson(doc.data())).toList());
+  updateBlog(id, newLikes, newLikesCount) {
+    final docUser = FirebaseFirestore.instance.collection('blogs').doc(id);
+    docUser.update({
+      'likes': newLikes,
+      'likesCount': newLikesCount,
+    });
+  }
 
   Stream<List<Blogs>> readPosts() => FirebaseFirestore.instance
       .collection('blogs')

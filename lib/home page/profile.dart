@@ -223,23 +223,33 @@ class _ProfileState extends State<Profile> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    IconButton(
-                      onPressed: () {},
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
-                      splashRadius: 20,
-                      icon: Icon(
-                        Icons.star_border,
-                        size: 18,
-                      ),
+                    const Icon(
+                      Icons.thumb_up_sharp,
+                      color: Colors.white54,
+                      size: 18,
                     ),
                     Text(
-                      ' 1k Stars',
+                      ' ${blogs.likesCount.toString()}',
                       style: GoogleFonts.poppins(
                         color: Colors.white54,
                         fontSize: 12,
                       ),
-                    )
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Icon(
+                      Icons.message_outlined,
+                      color: Colors.white54,
+                      size: 18,
+                    ),
+                    Text(
+                      ' ${blogs.likesCount.toString()}',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
               ],

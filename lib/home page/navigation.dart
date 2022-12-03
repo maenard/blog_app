@@ -15,7 +15,7 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   final currentUser = FirebaseAuth.instance.currentUser!;
-  int navBarIndex = 0;
+  int navBarIndex = 1;
   screens() => [
         Profile(),
         Home(),
