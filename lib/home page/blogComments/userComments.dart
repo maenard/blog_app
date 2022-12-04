@@ -1,3 +1,4 @@
+import 'package:blog_app/home%20page/blogComments/editComment.dart';
 import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/comments.dart';
 import 'package:blog_app/model/users.dart';
@@ -161,7 +162,12 @@ class _UserCommentsState extends State<UserComments> {
       children: [
         GestureDetector(
           onTap: () {
-            print('edit');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditComments(comments: comments),
+              ),
+            );
           },
           child: Text(
             'Edit',

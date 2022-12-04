@@ -1,36 +1,32 @@
-import 'package:blog_app/model/blogs.dart';
-import 'package:blog_app/model/users.dart';
+import 'package:blog_app/model/comments.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 import 'package:google_fonts/google_fonts.dart';
 
-class EditPost extends StatefulWidget {
-  const EditPost({
+class EditComments extends StatefulWidget {
+  const EditComments({
     super.key,
-    required this.blogs,
+    required this.comments,
   });
-
-  final Blogs blogs;
+  final Comments comments;
 
   @override
-  State<EditPost> createState() => _EditPostState();
+  State<EditComments> createState() => _EditCommentsState();
 }
 
-class _EditPostState extends State<EditPost> {
-  final user = FirebaseAuth.instance.currentUser!;
-  late TextEditingController postcontroller;
-  late Users currentUserInfo;
+class _EditCommentsState extends State<EditComments> {
+  late TextEditingController commentController;
 
   @override
   void initState() {
     super.initState();
-    postcontroller = TextEditingController(text: widget.blogs.content);
+    commentController =
+        TextEditingController(text: widget.comments.commentcontent);
   }
 
   @override
   void dispose() {
-    postcontroller.dispose();
+    commentController.dispose();
     super.dispose();
   }
 
@@ -39,8 +35,9 @@ class _EditPostState extends State<EditPost> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: Text(
-          "Edit Blogs",
+          "Edit Comment",
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
           ),
@@ -48,23 +45,23 @@ class _EditPostState extends State<EditPost> {
         actions: [
           IconButton(
             onPressed: () {
-              if (postcontroller.text.isEmpty) {
+              if (commentController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     duration: const Duration(seconds: 5),
                     content: Text(
-                      "Your post is empty!",
+                      "Your comment is empty!",
                       style: GoogleFonts.poppins(),
                     ),
                   ),
                 );
               } else {
-                updateBlog(widget.blogs.postId);
+                updateComment(widget.comments.commentId);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     duration: const Duration(seconds: 5),
                     content: Text(
-                      "Blog Updated Successfuly!",
+                      "Comment Updated Successfuly!",
                       style: GoogleFonts.poppins(),
                     ),
                   ),
@@ -74,7 +71,6 @@ class _EditPostState extends State<EditPost> {
             icon: const Icon(Icons.save),
           ),
         ],
-        backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -82,7 +78,7 @@ class _EditPostState extends State<EditPost> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              readCurrentUser(user.uid),
+              postField(widget.comments),
             ],
           ),
         ),
@@ -90,13 +86,13 @@ class _EditPostState extends State<EditPost> {
     );
   }
 
-  Widget postField(Users user) => Column(
+  Widget postField(Comments comments) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          userInfo(user),
+          userInfo(comments),
           TextField(
             onChanged: (value) => {
-              if (postcontroller.text.isEmpty)
+              if (commentController.text.isEmpty)
                 {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -113,7 +109,7 @@ class _EditPostState extends State<EditPost> {
             },
             maxLines: null,
             scrollPadding: const EdgeInsets.only(bottom: 50),
-            controller: postcontroller,
+            controller: commentController,
             decoration: InputDecoration(
               hintText: 'What\'s on your mind?',
               hintStyle: GoogleFonts.poppins(),
@@ -129,19 +125,19 @@ class _EditPostState extends State<EditPost> {
   imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
   imgExist(img) => NetworkImage(img);
 
-  Widget userInfo(Users newUser) => Row(
+  Widget userInfo(Comments comments) => Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundImage: newUser.userProfilePic == "-"
+            backgroundImage: comments.commenterimg == "-"
                 ? imgNotExist()
-                : imgExist(newUser.userProfilePic),
+                : imgExist(comments.commenterimg),
           ),
           const SizedBox(
             width: 10,
           ),
           Text(
-            newUser.name,
+            comments.commentername,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
               fontSize: 15,
@@ -150,41 +146,12 @@ class _EditPostState extends State<EditPost> {
         ],
       );
 
-  updateBlog(id) {
-    final docUser = FirebaseFirestore.instance.collection('blogs').doc(id);
+  updateComment(id) {
+    final docUser = FirebaseFirestore.instance.collection('comments').doc(id);
     docUser.update({
-      'content': postcontroller.text,
+      'commentcontent': commentController.text,
     });
 
     Navigator.pop(context);
-  }
-
-  Widget readCurrentUser(uid) {
-    var collection = FirebaseFirestore.instance.collection('users');
-    return Column(
-      children: [
-        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: collection.doc(uid).snapshots(),
-          builder: (_, snapshot) {
-            if (snapshot.hasError) return Text('Error = ${snapshot.error}');
-
-            if (snapshot.hasData) {
-              final users = snapshot.data!.data();
-              final newUser = Users(
-                id: users!['id'],
-                name: users['name'],
-                password: users['password'],
-                email: users['email'],
-                userProfilePic: users['userProfilePic'],
-                userProfileCover: users['userProfileCover'],
-              );
-              currentUserInfo = newUser;
-              return (postField(newUser));
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
-        ),
-      ],
-    );
   }
 }

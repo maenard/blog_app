@@ -1,3 +1,4 @@
+import 'package:blog_app/home%20page/UserProfile/editProfile.dart';
 import 'package:blog_app/home%20page/blogComments/userComments.dart';
 import 'package:blog_app/home%20page/post/editPost.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
@@ -8,7 +9,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:sweetsheet/sweetsheet.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -19,13 +19,10 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final user = FirebaseAuth.instance.currentUser!;
-  final SweetSheet dialog = SweetSheet();
-  late String currUserName;
 
   @override
   void initState() {
     super.initState();
-    currUserName = "";
   }
 
   @override
@@ -40,6 +37,37 @@ class _ProfileState extends State<Profile> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              final db = FirebaseFirestore.instance;
+              final docRef = db.collection("users").doc(user.uid);
+              docRef.get().then(
+                (DocumentSnapshot doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final newUser = Users(
+                    id: data['id'],
+                    name: data['name'],
+                    password: data['password'],
+                    email: data['email'],
+                    userProfilePic: data['userProfilePic'],
+                    userProfileCover: data['userProfileCover'],
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditProfile(
+                        newUser: newUser,
+                      ),
+                    ),
+                  );
+                },
+                onError: (e) => print("Error getting document: $e"),
+              );
+            },
+            icon: Icon(Icons.mode_edit_outlined),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
