@@ -51,9 +51,7 @@ class _UserCommentsState extends State<UserComments> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: ListView(
-                children: [fetchBlogComments()],
-              ),
+              child: fetchBlogComments(),
             ),
           ),
           commentField(),
@@ -179,47 +177,7 @@ class _UserCommentsState extends State<UserComments> {
         ),
         GestureDetector(
           onTap: () {
-            dialog.show(
-              icon: Icons.delete,
-              context: context,
-              title: Text(
-                'Are you sure?',
-                style: GoogleFonts.poppins(),
-              ),
-              description: Text(
-                'This comment will be deleted. You can not undo these changes.',
-                style: GoogleFonts.poppins(),
-              ),
-              color: SweetSheetColor.DANGER,
-              negative: SweetSheetAction(
-                title: 'Cancel',
-                icon: Icons.close,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              positive: SweetSheetAction(
-                title: 'Yes',
-                icon: Icons.check,
-                onPressed: () {
-                  final commentCount = widget.blogs.totalComments;
-                  final newCommentCount = commentCount - 1;
-                  deleteComment(comments.commentId);
-                  updateCommentsCount(widget.blogs.postId, newCommentCount);
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: const Duration(seconds: 5),
-                      content: Text(
-                        "Your post is deleted!",
-                        style: GoogleFonts.poppins(),
-                      ),
-                    ),
-                  );
-                  Navigator.pop(context);
-                },
-              ),
-            );
+            _showdialog(comments);
           },
           child: Text(
             'Delete',
@@ -233,6 +191,57 @@ class _UserCommentsState extends State<UserComments> {
       ],
     );
   }
+
+  _popUpDialog(Comments comments) => AlertDialog(
+        title: Text(
+          'Are you sure?',
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+        content: Text(
+          'This comment will be deleted. You can not undo these changes.',
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              final commentCount = widget.blogs.totalComments;
+              final newCommentCount = commentCount - 1;
+              deleteComment(comments.commentId);
+              updateCommentsCount(widget.blogs.postId, newCommentCount);
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  duration: const Duration(seconds: 5),
+                  content: Text(
+                    "Your comment was deleted!",
+                    style: GoogleFonts.poppins(),
+                  ),
+                ),
+              );
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Yes',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ),
+        ],
+        backgroundColor: Colors.black,
+      );
+
+  _showdialog(Comments comments) => showDialog(
+        context: context,
+        builder: (_) => _popUpDialog(comments),
+      );
 
   deleteComment(id) {
     final docUser = FirebaseFirestore.instance.collection('comments').doc(id);
@@ -300,10 +309,18 @@ class _UserCommentsState extends State<UserComments> {
           return Text('Something went wrong! ${snapshot.error}');
         } else if (snapshot.hasData) {
           final comments = snapshot.data!;
-
-          return Column(
-            children: comments.map(blogComments).toList(),
-          );
+          if (comments.isEmpty) {
+            return Center(
+              child: Text(
+                'This blog has no comments',
+                style: GoogleFonts.poppins(color: Colors.white54),
+              ),
+            );
+          } else {
+            return ListView(
+              children: comments.map(blogComments).toList(),
+            );
+          }
         } else {
           return const Center(
             child: CircularProgressIndicator(),

@@ -1,3 +1,4 @@
+import 'package:blog_app/home%20page/blogComments/userComments.dart';
 import 'package:blog_app/home%20page/post/editPost.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
 import 'package:blog_app/model/blogs.dart';
@@ -79,9 +80,21 @@ class _ProfileState extends State<Profile> {
           return Text('Something went wrong! ${snapshot.error}');
         } else if (snapshot.hasData) {
           final blogs = snapshot.data!;
-          return Column(
-            children: blogs.map(userPost).toList(),
-          );
+          if (blogs.isEmpty) {
+            return Center(
+              child: Text(
+                'You don\'t have any blog yet',
+                style: GoogleFonts.poppins(
+                  color: Colors.white54,
+                  height: 3,
+                ),
+              ),
+            );
+          } else {
+            return Column(
+              children: blogs.map(userPost).toList(),
+            );
+          }
         } else {
           return const Center(
             child: CircularProgressIndicator.adaptive(),
@@ -97,9 +110,10 @@ class _ProfileState extends State<Profile> {
             height: 10,
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 10,
+            padding: const EdgeInsets.only(
+              right: 20,
+              left: 20,
+              top: 10,
             ),
             color: Colors.white10,
             width: MediaQuery.of(context).size.width,
@@ -139,65 +153,39 @@ class _ProfileState extends State<Profile> {
                       ],
                     ),
                     const Expanded(child: SizedBox()),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      splashRadius: 20,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditPost(blogs: blogs),
+                    SizedBox(
+                      width: 20,
+                      child: PopupMenuButton(
+                        onSelected: (value) {
+                          if (value == 'edit') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditPost(blogs: blogs),
+                              ),
+                            );
+                          } else {
+                            _showdialog(blogs);
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Text(
+                              'Edit',
+                              style: GoogleFonts.poppins(),
+                            ),
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.edit_note_rounded),
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Text(
+                              'Delete',
+                              style: GoogleFonts.poppins(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      splashRadius: 20,
-                      onPressed: () {
-                        dialog.show(
-                          icon: Icons.delete,
-                          context: context,
-                          title: Text(
-                            'Are you sure?',
-                            style: GoogleFonts.poppins(),
-                          ),
-                          description: Text(
-                            'This blog will be deleted. You can not undo these changes.',
-                            style: GoogleFonts.poppins(),
-                          ),
-                          color: SweetSheetColor.DANGER,
-                          negative: SweetSheetAction(
-                            title: 'Cancel',
-                            icon: Icons.close,
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          positive: SweetSheetAction(
-                            title: 'Yes',
-                            icon: Icons.check,
-                            onPressed: () {
-                              deleteBlog(blogs.postId);
-                              Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  duration: const Duration(seconds: 5),
-                                  content: Text(
-                                    "Your post is deleted!",
-                                    style: GoogleFonts.poppins(),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.delete_outline_rounded),
-                    )
                   ],
                 ),
                 const SizedBox(
@@ -224,28 +212,15 @@ class _ProfileState extends State<Profile> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.thumb_up_sharp,
-                      color: Colors.white54,
-                      size: 17,
-                    ),
                     Text(
-                      ' ${blogs.likesCount.toString()}',
+                      ' ${blogs.likesCount.toString()} ${likeGrammar(blogs.likesCount)} •',
                       style: GoogleFonts.poppins(
                         color: Colors.white54,
                         fontSize: 12,
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    const Icon(
-                      Icons.message_outlined,
-                      color: Colors.white54,
-                      size: 18,
-                    ),
                     Text(
-                      ' ${blogs.totalComments}',
+                      ' ${blogs.totalComments} ${commentGrammar(blogs.totalComments)}',
                       style: GoogleFonts.poppins(
                         color: Colors.white54,
                         fontSize: 12,
@@ -253,9 +228,182 @@ class _ProfileState extends State<Profile> {
                     ),
                   ],
                 ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Divider(
+                  height: .9,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          if (blogs.likes!.contains(user.uid)) {
+                            final newLikes = blogs.likes;
+                            final newLikesCount = blogs.likes!.length - 1;
+                            newLikes!.remove(user.uid);
+                            updateBlog(blogs.postId, newLikes, newLikesCount);
+                          } else {
+                            final newLikes = blogs.likes;
+                            final newLikesCount = blogs.likes!.length + 1;
+                            newLikes!.add(user.uid);
+                            updateBlog(blogs.postId, newLikes, newLikesCount);
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            blogs.likes!.contains(user.uid)
+                                ? liked()
+                                : notLiked(),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          final db = FirebaseFirestore.instance;
+                          final docRef = db.collection("users").doc(user.uid);
+                          docRef.get().then(
+                            (DocumentSnapshot doc) {
+                              final data = doc.data() as Map<String, dynamic>;
+                              final newUser = Users(
+                                id: data['id'],
+                                name: data['name'],
+                                password: data['password'],
+                                email: data['email'],
+                                userProfilePic: data['userProfilePic'],
+                                userProfileCover: data['userProfileCover'],
+                              );
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserComments(
+                                    blogs: blogs,
+                                    users: newUser,
+                                  ),
+                                ),
+                              );
+                            },
+                            onError: (e) => print("Error getting document: $e"),
+                          );
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.message_outlined,
+                              color: Colors.white54,
+                            ),
+                            Text(
+                              " Comment",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white54,
+                                fontSize: 12,
+                                // height: 3.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+        ],
+      );
+
+  _popUpDialog(Blogs blogs) => AlertDialog(
+        title: Text(
+          'Are you sure?',
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+        content: Text(
+          'This blog will be deleted. You can not undo these changes.',
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              deleteBlog(blogs.postId);
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  duration: const Duration(seconds: 5),
+                  content: Text(
+                    "Your blog is deleted!",
+                    style: GoogleFonts.poppins(),
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              'Yes',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ),
+        ],
+        backgroundColor: Colors.black,
+      );
+
+  _showdialog(Blogs blogs) => showDialog(
+        context: context,
+        builder: (_) => _popUpDialog(blogs),
+      );
+
+  likeGrammar(count) {
+    if (count <= 1) {
+      return 'Like';
+    } else {
+      return 'Likes';
+    }
+  }
+
+  commentGrammar(count) {
+    if (count <= 1) {
+      return 'Comment';
+    } else {
+      return 'Comments';
+    }
+  }
+
+  liked() => Row(
+        children: [
+          const Icon(
+            Icons.thumb_up_sharp,
+            color: Colors.blueAccent,
+          ),
+          Text(
+            ' Like',
+            style: GoogleFonts.poppins(color: Colors.blueAccent),
+          )
+        ],
+      );
+  notLiked() => Row(
+        children: [
+          const Icon(
+            Icons.thumb_up_sharp,
+            color: Colors.white54,
+          ),
+          Text(
+            ' Like',
+            style: GoogleFonts.poppins(color: Colors.white54),
+          )
         ],
       );
 
@@ -270,7 +418,7 @@ class _ProfileState extends State<Profile> {
       );
 
   addPost(Users newUser) => Container(
-        color: Colors.white10,
+        color: Color.fromARGB(35, 158, 158, 158),
         padding: const EdgeInsets.all(20),
         width: MediaQuery.of(context).size.width,
         child: Column(
@@ -355,7 +503,7 @@ class _ProfileState extends State<Profile> {
   imgExist(img) => NetworkImage(img);
 
   userDetail(Users newUser) => Container(
-        color: Colors.white10,
+        color: Color.fromARGB(35, 158, 158, 158),
         padding: const EdgeInsets.only(bottom: 20),
         width: MediaQuery.of(context).size.width,
         child: Column(
@@ -415,6 +563,14 @@ class _ProfileState extends State<Profile> {
           ],
         ),
       );
+
+  updateBlog(id, newLikes, newLikesCount) {
+    final docUser = FirebaseFirestore.instance.collection('blogs').doc(id);
+    docUser.update({
+      'likes': newLikes,
+      'likesCount': newLikesCount,
+    });
+  }
 
   deleteBlog(id) {
     final docUser = FirebaseFirestore.instance.collection('blogs').doc(id);

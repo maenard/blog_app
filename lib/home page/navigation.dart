@@ -35,7 +35,10 @@ class _NavigationState extends State<Navigation> {
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
+            selectedIcon: Icon(
+              Icons.person,
+              color: Colors.blueAccent,
+            ),
             label: 'Profile',
           ),
           NavigationDestination(

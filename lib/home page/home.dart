@@ -104,7 +104,7 @@ class _HomeState extends State<Home> {
               left: 20,
               top: 15,
             ),
-            color: Colors.white10,
+            color: Color.fromARGB(35, 158, 158, 158),
             width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -164,6 +164,29 @@ class _HomeState extends State<Home> {
                 const SizedBox(
                   height: 10,
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      ' ${blogs.likesCount.toString()} ${likeGrammar(blogs.likesCount)} •',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(
+                      ' ${blogs.totalComments} ${commentGrammar(blogs.totalComments)}',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
                 const Divider(
                   height: .9,
                 ),
@@ -189,31 +212,8 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             blogs.likes!.contains(user.uid)
-                                ? const Icon(
-                                    Icons.thumb_up_sharp,
-                                    color: Colors.blueAccent,
-                                  )
-                                : const Icon(
-                                    Icons.thumb_up_sharp,
-                                    color: Colors.white54,
-                                  ),
-                            blogs.likesCount <= 1
-                                ? Text(
-                                    " ${blogs.likesCount} like",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white54,
-                                      fontSize: 12,
-                                      // height: 3.5,
-                                    ),
-                                  )
-                                : Text(
-                                    " ${blogs.likesCount} likes",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white54,
-                                      fontSize: 12,
-                                      // height: 3.5,
-                                    ),
-                                  ),
+                                ? liked()
+                                : notLiked(),
                           ],
                         ),
                       ),
@@ -255,23 +255,14 @@ class _HomeState extends State<Home> {
                               Icons.message_outlined,
                               color: Colors.white54,
                             ),
-                            blogs.totalComments <= 1
-                                ? Text(
-                                    " ${blogs.totalComments} comment",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white54,
-                                      fontSize: 12,
-                                      // height: 3.5,
-                                    ),
-                                  )
-                                : Text(
-                                    " ${blogs.totalComments} comments",
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white54,
-                                      fontSize: 12,
-                                      // height: 3.5,
-                                    ),
-                                  ),
+                            Text(
+                              " Comment",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white54,
+                                fontSize: 12,
+                                // height: 3.5,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -284,8 +275,49 @@ class _HomeState extends State<Home> {
         ],
       );
 
+  likeGrammar(count) {
+    if (count <= 1) {
+      return 'Like';
+    } else {
+      return 'Likes';
+    }
+  }
+
+  commentGrammar(count) {
+    if (count <= 1) {
+      return 'Comment';
+    } else {
+      return 'Comments';
+    }
+  }
+
+  liked() => Row(
+        children: [
+          const Icon(
+            Icons.thumb_up_sharp,
+            color: Colors.blueAccent,
+          ),
+          Text(
+            ' Like',
+            style: GoogleFonts.poppins(color: Colors.blueAccent),
+          )
+        ],
+      );
+  notLiked() => Row(
+        children: [
+          const Icon(
+            Icons.thumb_up_sharp,
+            color: Colors.white54,
+          ),
+          Text(
+            ' Like',
+            style: GoogleFonts.poppins(color: Colors.white54),
+          )
+        ],
+      );
+
   Widget addPost(Users newUser) => Container(
-        color: Colors.white10,
+        color: Color.fromARGB(35, 158, 158, 158),
         padding: const EdgeInsets.all(20),
         width: MediaQuery.of(context).size.width,
         child: Column(
