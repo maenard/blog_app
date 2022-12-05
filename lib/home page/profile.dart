@@ -548,15 +548,17 @@ class _ProfileState extends State<Profile> {
                       ? Container(
                           color: Colors.white12,
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * .30,
+                          height: MediaQuery.of(context).size.height * .25,
                         )
-                      : Container(
-                          color: Colors.white12,
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * .30,
-                          child: FittedBox(
-                            fit: BoxFit.fill,
-                            child: Image.network(newUser.userProfileCover),
+                      : ClipRect(
+                          child: Container(
+                            color: Colors.white12,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height * .25,
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: Image.network(newUser.userProfileCover),
+                            ),
                           ),
                         ),
                   Positioned(

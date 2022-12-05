@@ -2,6 +2,10 @@ import 'package:blog_app/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:io';
+import 'dart:math';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({
@@ -19,6 +23,69 @@ class _EditProfileState extends State<EditProfile> {
   late TextEditingController emailcontroller;
   late TextEditingController passwordcontroller;
   late bool _isNotVisible;
+  late String error;
+  PlatformFile? pickedProfile;
+  PlatformFile? pickedCover;
+  UploadTask? uploadTaskProfile;
+  UploadTask? uploadTaskCover;
+
+  //pick function for user profile picture
+  Future selectProfile() async {
+    final profile = await FilePicker.platform.pickFiles();
+    if (profile == null) return;
+
+    setState(() {
+      pickedProfile = profile.files.first;
+    });
+  }
+
+  //pick function for user cover picture
+  Future selectCover() async {
+    final cover = await FilePicker.platform.pickFiles();
+    if (cover == null) return;
+
+    setState(() {
+      pickedCover = cover.files.first;
+    });
+  }
+
+  //generates random string for file name upload
+  String generateRandomString(int len) {
+    var r = Random();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
+        .join();
+  }
+
+  // upload profile to firebase storage
+  Future uploadProfile() async {
+    final path = 'files/${generateRandomString(8)}';
+    print('update path Link: $path');
+    final file = File(pickedProfile!.path!);
+
+    final ref = FirebaseStorage.instance.ref().child(path);
+
+    try {
+      setState(() {
+        uploadTaskProfile = ref.putFile(file);
+      });
+    } on FirebaseException catch (e) {
+      setState(() {
+        error = e.message.toString();
+      });
+    }
+
+    final snapshot = await uploadTaskProfile!.whenComplete(() {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    print('update Download Link: $urlDownload');
+
+    // updateUser(widget.newUser.id, urlDownload);
+
+    setState(() {
+      uploadTaskProfile = null;
+    });
+  }
 
   @override
   void initState() {
@@ -26,6 +93,7 @@ class _EditProfileState extends State<EditProfile> {
     namecontroller = TextEditingController(text: widget.newUser.name);
     emailcontroller = TextEditingController(text: widget.newUser.email);
     passwordcontroller = TextEditingController(text: widget.newUser.password);
+    error = "";
     _isNotVisible = true;
   }
 
@@ -52,7 +120,9 @@ class _EditProfileState extends State<EditProfile> {
         ),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              // batchUpdateComments(widget.newUser.id);
+            },
             child: Text(
               'Save',
               style: GoogleFonts.poppins(
@@ -71,9 +141,6 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
-  imgExist(img) => NetworkImage(img);
-
   userDetail(Users newUser) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -83,28 +150,26 @@ class _EditProfileState extends State<EditProfile> {
               alignment: Alignment.center,
               clipBehavior: Clip.none,
               children: [
-                newUser.userProfileCover == "-"
-                    ? Container(
-                        color: Colors.white12,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * .30,
-                      )
-                    : Container(
-                        color: Colors.white12,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * .30,
-                        child: FittedBox(
-                          fit: BoxFit.fill,
-                          child: Image.network(newUser.userProfileCover),
-                        ),
-                      ),
+                GestureDetector(
+                  onTap: () {
+                    selectCover();
+                  },
+                  child:
+                      pickedCover == null ? checkCoverVal() : pickedCoverFile(),
+                ),
                 Positioned(
                   bottom: -70,
-                  child: CircleAvatar(
-                    backgroundImage: newUser.userProfilePic == "-"
-                        ? imgNotExist()
-                        : imgExist(newUser.userProfilePic),
-                    radius: 70,
+                  child: GestureDetector(
+                    onTap: () {
+                      selectProfile();
+                      // print('object');
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: pickedProfile == null
+                          ? checkProfVal()
+                          : pickedProfileFileExist(),
+                      radius: 70,
+                    ),
                   ),
                 ),
               ],
@@ -116,6 +181,66 @@ class _EditProfileState extends State<EditProfile> {
           fields(),
         ],
       );
+
+  //user picked cover for update
+  pickedCoverFile() => ClipRect(
+        child: Container(
+          color: Colors.white12,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * .25,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: Image.file(
+              File(pickedCover!.path!),
+            ),
+          ),
+        ),
+      );
+
+  //checks if user has profile or not
+  checkCoverVal() {
+    return widget.newUser.userProfileCover == '-'
+        ? coverNotExist()
+        : coverExist(widget.newUser.userProfilePic);
+  }
+
+  //user cover doesn't exist
+  coverNotExist() => Container(
+        color: Colors.white12,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height * .25,
+      );
+
+  //user cover profile exist
+  coverExist(img) => ClipRect(
+        child: Container(
+          color: Colors.white12,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * .25,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: Image.network(img),
+          ),
+        ),
+      );
+
+  //user pics profile pic
+  pickedProfileFileExist() => FileImage(
+        File(pickedProfile!.path!),
+      );
+
+  //check if user has profile
+  checkProfVal() {
+    return widget.newUser.userProfilePic == '-'
+        ? imgNotExist()
+        : imgExist(widget.newUser.userProfilePic);
+  }
+
+  //user doesn't have a profile
+  imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
+
+  //user has profile
+  imgExist(img) => NetworkImage(img);
 
   Widget fields() => Padding(
         padding: const EdgeInsets.all(20),
@@ -171,21 +296,16 @@ class _EditProfileState extends State<EditProfile> {
             ),
             Row(
               children: [
-                _loginbtn(),
+                saveBtn(),
               ],
             ),
           ],
         ),
       );
 
-  Widget _loginbtn() => Expanded(
+  Widget saveBtn() => Expanded(
         child: TextButton(
-          onPressed: () {
-            // final isValidForm = logInKey.currentState!.validate();
-            // if (isValidForm == true) {
-            //   signIn();
-            // }
-          },
+          onPressed: () {},
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
             shape: RoundedRectangleBorder(
@@ -242,22 +362,60 @@ class _EditProfileState extends State<EditProfile> {
         validator: validator,
       );
 
-  // Stream<List<Users>> readUser() => FirebaseFirestore.instance
-  //     .collection('users').doc('asdf')
-  //     .where('password', isEqualTo: 'maenard')
-  //     .snapshots().
-  //     .map((snapshot) =>
-  //         snapshot.docs.re);
-
-  updateBlog(id) {
-    final docUser = FirebaseFirestore.instance.collection('users').doc();
-    docUser.update({
-      'name': namecontroller.text,
+  Future updateUserInfo(id) async {
+    final docUser = FirebaseFirestore.instance.collection('users').doc(id);
+    await docUser.update({
       'password': passwordcontroller.text,
-      // 'userProfilePic': postcontroller.text,
-      // 'userProfileCover': postcontroller.text,
+      'email': emailcontroller.text,
+      'name': namecontroller.text,
     });
+    // Navigator.pop(context);
+  }
 
-    Navigator.pop(context);
+  Future updateUserProfilePic(id, profile) async {
+    final docUser = FirebaseFirestore.instance.collection('users').doc(id);
+    await docUser.update({
+      'userProfilePic': profile,
+    });
+    // Navigator.pop(context);
+  }
+
+  Future updateUserCoverPic(id, cover) async {
+    final docUser = FirebaseFirestore.instance.collection('users').doc(id);
+    await docUser.update({
+      'userProfileCover': cover,
+    });
+    // Navigator.pop(context);
+  }
+
+  //this works
+  Future<void> batchUpdateComments(id) {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    final _doc = FirebaseFirestore.instance.collection('comments');
+    final comments = FirebaseFirestore.instance
+        .collection('comments')
+        .where('commenterId', isEqualTo: id);
+    return comments.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((document) {
+        batch.update(
+            _doc.doc(document.id), {'commentername': namecontroller.text});
+      });
+
+      return batch.commit();
+    });
+  }
+
+  Future<void> batchUpdateBlogs(id) {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    final comments = FirebaseFirestore.instance
+        .collection('comments')
+        .where('postId', isEqualTo: id);
+    return comments.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((document) {
+        batch.delete(document.reference);
+      });
+
+      return batch.commit();
+    });
   }
 }

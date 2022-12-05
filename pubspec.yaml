@@ -44,6 +44,8 @@ dependencies:
   cloud_firestore: ^4.1.0
   intl: ^0.17.0
   sweetsheet: ^0.4.0
+  firebase_storage: ^11.0.6
+  file_picker: ^5.2.3
 
 dev_dependencies:
   flutter_test:

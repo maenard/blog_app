@@ -21,14 +21,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final user = FirebaseAuth.instance.currentUser!;
-  late String currentUserName;
-  late String userId;
+  // late String currentUserName;
+  // late String userId;
 
   @override
   void initState() {
     super.initState();
-    currentUserName = "";
-    userId = "";
+    // currentUserName = "";
+    // userId = "";
   }
 
   @override
@@ -58,9 +58,23 @@ class _HomeState extends State<Home> {
           return Text('Something went wrong! ${snapshot.error}');
         } else if (snapshot.hasData) {
           final blogs = snapshot.data!;
-          return Column(
-            children: blogs.map(userPost).toList(),
-          );
+          if (blogs.isEmpty) {
+            return Column(
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'There is no user blogs yet',
+                  style: GoogleFonts.poppins(color: Colors.white54),
+                ),
+              ],
+            );
+          } else {
+            return Column(
+              children: blogs.map(userPost).toList(),
+            );
+          }
         } else {
           return const Center(
             child: CircularProgressIndicator(),
