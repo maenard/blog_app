@@ -368,6 +368,7 @@ class _ProfileState extends State<Profile> {
           ),
           TextButton(
             onPressed: () {
+              batchDeleteComments(blogs.postId);
               deleteBlog(blogs.postId);
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
@@ -597,6 +598,20 @@ class _ProfileState extends State<Profile> {
     docUser.update({
       'likes': newLikes,
       'likesCount': newLikesCount,
+    });
+  }
+
+  Future<void> batchDeleteComments(id) {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    final comments = FirebaseFirestore.instance
+        .collection('comments')
+        .where('postId', isEqualTo: id);
+    return comments.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((document) {
+        batch.delete(document.reference);
+      });
+
+      return batch.commit();
     });
   }
 
