@@ -5,6 +5,7 @@ import 'package:blog_app/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -15,33 +16,57 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   final currentUser = FirebaseAuth.instance.currentUser!;
-  int navBarIndex = 1;
+  int navBarIndex = 0;
   screens() => [
-        Profile(),
-        Home(),
-        UserNotif(),
+        const Profile(),
+        const Home(),
+        const UserNotif(),
       ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(35, 158, 158, 158),
+        elevation: 0,
+        title: Text(
+          '.blog',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+            child: Text(
+              'Sign out',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w300,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 5,
+          )
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         height: 60,
         selectedIndex: navBarIndex,
         onDestinationSelected: (navBarIndex) =>
             setState(() => this.navBarIndex = navBarIndex),
         elevation: 0,
-        backgroundColor: Colors.black,
-        destinations: const [
+        backgroundColor: const Color.fromARGB(35, 158, 158, 158),
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(
-              Icons.person,
-              color: Colors.blueAccent,
-            ),
+            icon: fetchCurrentUserProfilePic(),
+            selectedIcon: fetchCurrentUserProfilePic(),
             label: 'Profile',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(
               Icons.home,
@@ -49,7 +74,7 @@ class _NavigationState extends State<Navigation> {
             ),
             label: 'Home',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.notifications_active_outlined),
             selectedIcon: Icon(
               Icons.notifications,
@@ -61,6 +86,25 @@ class _NavigationState extends State<Navigation> {
       ),
       backgroundColor: Colors.black,
       body: screens()[navBarIndex],
+    );
+  }
+
+  Widget fetchCurrentUserProfilePic() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return CircleAvatar(
+            backgroundImage: NetworkImage(snapshot.data?['userProfilePic']),
+            radius: 15,
+          );
+        } else {
+          return const Icon(Icons.person);
+        }
+      },
     );
   }
 }

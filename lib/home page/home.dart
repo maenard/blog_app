@@ -332,7 +332,7 @@ class _HomeState extends State<Home> {
 
   Widget addPost(Users newUser) => Container(
         color: Color.fromARGB(35, 158, 158, 158),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.only(top: 5, bottom: 20, right: 20, left: 20),
         width: MediaQuery.of(context).size.width,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -422,14 +422,6 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ],
-              ),
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints(),
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                },
-                icon: Icon(Icons.logout_outlined),
               ),
             ],
           ),

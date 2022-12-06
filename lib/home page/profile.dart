@@ -1,14 +1,19 @@
-import 'package:blog_app/home%20page/UserProfile/editProfile.dart';
+import 'package:blog_app/home%20page/UserProfile/uploadCoverPic.dart';
+import 'package:blog_app/home%20page/UserProfile/uploadProfilePic.dart';
 import 'package:blog_app/home%20page/blogComments/userComments.dart';
 import 'package:blog_app/home%20page/post/editPost.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
 import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'dart:math';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -29,46 +34,6 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          'Profile',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              final db = FirebaseFirestore.instance;
-              final docRef = db.collection("users").doc(user.uid);
-              docRef.get().then(
-                (DocumentSnapshot doc) {
-                  final data = doc.data() as Map<String, dynamic>;
-                  final newUser = Users(
-                    id: data['id'],
-                    name: data['name'],
-                    password: data['password'],
-                    email: data['email'],
-                    userProfilePic: data['userProfilePic'],
-                    userProfileCover: data['userProfileCover'],
-                  );
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditProfile(
-                        newUser: newUser,
-                      ),
-                    ),
-                  );
-                },
-                onError: (e) => print("Error getting document: $e"),
-              );
-            },
-            icon: Icon(Icons.mode_edit_outlined),
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -545,31 +510,9 @@ class _ProfileState extends State<Profile> {
                 clipBehavior: Clip.none,
                 children: [
                   newUser.userProfileCover == "-"
-                      ? Container(
-                          color: Colors.white12,
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * .25,
-                        )
-                      : ClipRect(
-                          child: Container(
-                            color: Colors.white12,
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height * .25,
-                            child: FittedBox(
-                              fit: BoxFit.cover,
-                              child: Image.network(newUser.userProfileCover),
-                            ),
-                          ),
-                        ),
-                  Positioned(
-                    bottom: -70,
-                    child: CircleAvatar(
-                      backgroundImage: newUser.userProfilePic == "-"
-                          ? imgNotExist()
-                          : imgExist(newUser.userProfilePic),
-                      radius: 70,
-                    ),
-                  ),
+                      ? userNoCoverPhoto(newUser)
+                      : userHasCoverPhoto(newUser),
+                  userProfilePic(newUser),
                 ],
               ),
             ),
@@ -594,6 +537,125 @@ class _ProfileState extends State<Profile> {
           ],
         ),
       );
+
+  userProfilePic(Users newUser) {
+    return Positioned(
+      bottom: -70,
+      child: Stack(
+        alignment: Alignment.topLeft,
+        children: [
+          CircleAvatar(
+            backgroundImage: newUser.userProfilePic == "-"
+                ? imgNotExist()
+                : imgExist(newUser.userProfilePic),
+            radius: 70,
+          ),
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.blueAccent,
+            child: GestureDetector(
+              onTap: () {
+                // selectProfile();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UploadProfilePic(newUser: newUser),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.camera_alt_outlined,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  userHasCoverPhoto(Users newUser) {
+    return Stack(
+      children: [
+        ClipRect(
+          child: Container(
+            color: Colors.white12,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * .25,
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: Image.network(newUser.userProfileCover),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 5,
+          left: 5,
+          child: CircleAvatar(
+            radius: 15,
+            backgroundColor: Color.fromARGB(105, 68, 137, 255),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UploadCoverPic(newUser: newUser),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.photo_camera_front_outlined,
+                color: Colors.white,
+                size: 15,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  userNoCoverPhoto(Users newUser) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UploadCoverPic(newUser: newUser),
+          ),
+        );
+      },
+      child: Container(
+        color: Colors.white12,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height * .25,
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.camera_alt_outlined,
+                  color: Colors.grey,
+                  size: 15,
+                ),
+                Text(
+                  ' Tap to update your cover photo.',
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   updateBlog(id, newLikes, newLikesCount) {
     final docUser = FirebaseFirestore.instance.collection('blogs').doc(id);
