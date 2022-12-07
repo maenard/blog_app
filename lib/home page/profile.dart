@@ -1,3 +1,4 @@
+import 'package:blog_app/home%20page/UserProfile/editProfile.dart';
 import 'package:blog_app/home%20page/UserProfile/uploadCoverPic.dart';
 import 'package:blog_app/home%20page/UserProfile/uploadProfilePic.dart';
 import 'package:blog_app/home%20page/blogComments/userComments.dart';
@@ -532,6 +533,23 @@ class _ProfileState extends State<Profile> {
                 color: Colors.white54,
                 fontSize: 15,
                 height: .9,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfile(newUser: newUser),
+                  ),
+                );
+              },
+              child: Text(
+                'Edit Profile',
+                style: GoogleFonts.poppins(
+                  color: Colors.blueAccent,
+                  fontSize: 15,
+                ),
               ),
             ),
           ],

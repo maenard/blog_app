@@ -135,112 +135,20 @@ class _EditProfileState extends State<EditProfile> {
       ),
       body: ListView(
         children: [
-          userDetail(widget.newUser),
+          Center(
+            child: Text(
+              '.blog',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w900,
+                fontSize: 80,
+              ),
+            ),
+          ),
+          fields(),
         ],
       ),
     );
   }
-
-  userDetail(Users newUser) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 70),
-            child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    selectCover();
-                  },
-                  child:
-                      pickedCover == null ? checkCoverVal() : pickedCoverFile(),
-                ),
-                Positioned(
-                  bottom: -70,
-                  child: GestureDetector(
-                    onTap: () {
-                      selectProfile();
-                      // print('object');
-                    },
-                    child: CircleAvatar(
-                      backgroundImage: pickedProfile == null
-                          ? checkProfVal()
-                          : pickedProfileFileExist(),
-                      radius: 70,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          fields(),
-        ],
-      );
-
-  //user picked cover for update
-  pickedCoverFile() => ClipRect(
-        child: Container(
-          color: Colors.white12,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * .25,
-          child: FittedBox(
-            fit: BoxFit.cover,
-            child: Image.file(
-              File(pickedCover!.path!),
-            ),
-          ),
-        ),
-      );
-
-  //checks if user has profile or not
-  checkCoverVal() {
-    return widget.newUser.userProfileCover == '-'
-        ? coverNotExist()
-        : coverExist(widget.newUser.userProfilePic);
-  }
-
-  //user cover doesn't exist
-  coverNotExist() => Container(
-        color: Colors.white12,
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .25,
-      );
-
-  //user cover profile exist
-  coverExist(img) => ClipRect(
-        child: Container(
-          color: Colors.white12,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * .25,
-          child: FittedBox(
-            fit: BoxFit.cover,
-            child: Image.network(img),
-          ),
-        ),
-      );
-
-  //user pics profile pic
-  pickedProfileFileExist() => FileImage(
-        File(pickedProfile!.path!),
-      );
-
-  //check if user has profile
-  checkProfVal() {
-    return widget.newUser.userProfilePic == '-'
-        ? imgNotExist()
-        : imgExist(widget.newUser.userProfilePic);
-  }
-
-  //user doesn't have a profile
-  imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
-
-  //user has profile
-  imgExist(img) => NetworkImage(img);
 
   Widget fields() => Padding(
         padding: const EdgeInsets.all(20),
