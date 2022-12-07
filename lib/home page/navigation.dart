@@ -1,6 +1,6 @@
 import 'package:blog_app/home%20page/home.dart';
 import 'package:blog_app/home%20page/profile.dart';
-import 'package:blog_app/home%20page/userNotif.dart';
+import 'package:blog_app/home%20page/searchUsers.dart';
 import 'package:blog_app/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,18 +16,18 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   final currentUser = FirebaseAuth.instance.currentUser!;
-  int navBarIndex = 0;
+  int navBarIndex = 1;
   screens() => [
         const Profile(),
         const Home(),
-        const UserNotif(),
+        const SearchUsers(),
       ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(35, 158, 158, 158),
+        backgroundColor: Color.fromARGB(39, 158, 158, 158),
         elevation: 0,
         title: Text(
           '.blog',
@@ -75,12 +75,12 @@ class _NavigationState extends State<Navigation> {
             label: 'Home',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.notifications_active_outlined),
+            icon: Icon(Icons.search),
             selectedIcon: Icon(
-              Icons.notifications,
+              Icons.search,
               color: Colors.blueAccent,
             ),
-            label: 'Notifications',
+            label: 'Search',
           ),
         ],
       ),

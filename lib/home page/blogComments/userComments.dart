@@ -132,7 +132,7 @@ class _UserCommentsState extends State<UserComments> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      TimeDiff.getTimeDifferenceFromNow(
+                      TimeDiff().getTimeDifferenceFromNow(
                         comments.commentime.toDate(),
                       ),
                       style: GoogleFonts.poppins(

@@ -119,7 +119,7 @@ class _HomeState extends State<Home> {
               left: 20,
               top: 15,
             ),
-            color: Color.fromARGB(35, 158, 158, 158),
+            color: Color.fromARGB(39, 158, 158, 158),
             width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -148,13 +148,12 @@ class _HomeState extends State<Home> {
                           overflow: TextOverflow.clip,
                         ),
                         Text(
-                          TimeDiff.getTimeDifferenceFromNow(
+                          TimeDiff().getTimeDifferenceFromNow(
                             blogs.datePosted.toDate(),
                           ),
                           style: GoogleFonts.poppins(
                             color: Colors.white54,
                             fontSize: 12,
-                            height: 1.2,
                           ),
                         ),
                       ],
@@ -334,7 +333,7 @@ class _HomeState extends State<Home> {
       );
 
   Widget addPost(Users newUser) => Container(
-        color: Color.fromARGB(35, 158, 158, 158),
+        color: Color.fromARGB(39, 158, 158, 158),
         padding: const EdgeInsets.only(top: 5, bottom: 20, right: 20, left: 20),
         width: MediaQuery.of(context).size.width,
         child: Column(

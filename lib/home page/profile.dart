@@ -110,7 +110,7 @@ class _ProfileState extends State<Profile> {
               left: 20,
               top: 10,
             ),
-            color: Colors.white10,
+            color: Color.fromARGB(39, 158, 158, 158),
             width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -138,7 +138,7 @@ class _ProfileState extends State<Profile> {
                           overflow: TextOverflow.clip,
                         ),
                         Text(
-                          TimeDiff.getTimeDifferenceFromNow(
+                          TimeDiff().getTimeDifferenceFromNow(
                             blogs.datePosted.toDate(),
                           ),
                           style: GoogleFonts.poppins(
@@ -417,7 +417,7 @@ class _ProfileState extends State<Profile> {
       );
 
   addPost(Users newUser) => Container(
-        color: const Color.fromARGB(35, 158, 158, 158),
+        color: Color.fromARGB(39, 158, 158, 158),
         padding: const EdgeInsets.all(20),
         width: MediaQuery.of(context).size.width,
         child: Column(
@@ -523,7 +523,7 @@ class _ProfileState extends State<Profile> {
   imgExist(img) => NetworkImage(img);
 
   userDetail(Users newUser) => Container(
-        color: Color.fromARGB(35, 158, 158, 158),
+        color: Color.fromARGB(39, 158, 158, 158),
         padding: const EdgeInsets.only(bottom: 20),
         width: MediaQuery.of(context).size.width,
         child: Column(

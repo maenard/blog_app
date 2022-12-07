@@ -1,5 +1,5 @@
 class TimeDiff {
-  static getTimeDifferenceFromNow(DateTime dateTime) {
+  getTimeDifferenceFromNow(DateTime dateTime) {
     Duration difference = DateTime.now().difference(dateTime);
     if (difference.inSeconds < 5) {
       return "Just now";
