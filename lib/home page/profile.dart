@@ -6,6 +6,7 @@ import 'package:blog_app/home%20page/post/editPost.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
 import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/users.dart';
+import 'package:blog_app/timeDiff.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -137,11 +138,13 @@ class _ProfileState extends State<Profile> {
                           overflow: TextOverflow.clip,
                         ),
                         Text(
-                          DateFormat('MMM. dd, yyyy | EEE.')
-                              .format(blogs.datePosted.toDate()),
+                          TimeDiff.getTimeDifferenceFromNow(
+                            blogs.datePosted.toDate(),
+                          ),
                           style: GoogleFonts.poppins(
+                            color: Colors.white54,
                             fontSize: 12,
-                            height: 1.2,
+                            height: 1.5,
                           ),
                         ),
                       ],
@@ -271,6 +274,7 @@ class _ProfileState extends State<Profile> {
                                 email: data['email'],
                                 userProfilePic: data['userProfilePic'],
                                 userProfileCover: data['userProfileCover'],
+                                about: data['about'],
                               );
 
                               Navigator.push(
@@ -413,7 +417,7 @@ class _ProfileState extends State<Profile> {
       );
 
   addPost(Users newUser) => Container(
-        color: Color.fromARGB(35, 158, 158, 158),
+        color: const Color.fromARGB(35, 158, 158, 158),
         padding: const EdgeInsets.all(20),
         width: MediaQuery.of(context).size.width,
         child: Column(
@@ -441,6 +445,27 @@ class _ProfileState extends State<Profile> {
           ],
         ),
       );
+
+  aboutAndPost(text) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          text,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        const Expanded(
+          child: Divider(
+            color: Colors.white,
+            indent: 10,
+          ),
+        ),
+      ],
+    );
+  }
 
   postField(Users newUser) => Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -552,6 +577,21 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
+            const SizedBox(
+              height: 5,
+            ),
+            newUser.about == ""
+                ? Container()
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      newUser.about,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white54,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
           ],
         ),
       );

@@ -348,6 +348,7 @@ class _RegisterState extends State<Register> {
       name: namecontroller.text,
       userProfilePic: '-',
       userProfileCover: '-',
+      about: '',
     );
 
     final json = newUser.toJson();

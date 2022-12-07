@@ -1,5 +1,6 @@
 import 'package:blog_app/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:io';
@@ -19,73 +20,12 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+  final user = FirebaseAuth.instance.currentUser!;
   late TextEditingController namecontroller;
   late TextEditingController emailcontroller;
   late TextEditingController passwordcontroller;
+  late TextEditingController aboutcontroller;
   late bool _isNotVisible;
-  late String error;
-  PlatformFile? pickedProfile;
-  PlatformFile? pickedCover;
-  UploadTask? uploadTaskProfile;
-  UploadTask? uploadTaskCover;
-
-  //pick function for user profile picture
-  Future selectProfile() async {
-    final profile = await FilePicker.platform.pickFiles();
-    if (profile == null) return;
-
-    setState(() {
-      pickedProfile = profile.files.first;
-    });
-  }
-
-  //pick function for user cover picture
-  Future selectCover() async {
-    final cover = await FilePicker.platform.pickFiles();
-    if (cover == null) return;
-
-    setState(() {
-      pickedCover = cover.files.first;
-    });
-  }
-
-  //generates random string for file name upload
-  String generateRandomString(int len) {
-    var r = Random();
-    const _chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
-        .join();
-  }
-
-  // upload profile to firebase storage
-  Future uploadProfile() async {
-    final path = 'files/${generateRandomString(8)}';
-    print('update path Link: $path');
-    final file = File(pickedProfile!.path!);
-
-    final ref = FirebaseStorage.instance.ref().child(path);
-
-    try {
-      setState(() {
-        uploadTaskProfile = ref.putFile(file);
-      });
-    } on FirebaseException catch (e) {
-      setState(() {
-        error = e.message.toString();
-      });
-    }
-
-    final snapshot = await uploadTaskProfile!.whenComplete(() {});
-    final urlDownload = await snapshot.ref.getDownloadURL();
-    print('update Download Link: $urlDownload');
-
-    // updateUser(widget.newUser.id, urlDownload);
-
-    setState(() {
-      uploadTaskProfile = null;
-    });
-  }
 
   @override
   void initState() {
@@ -93,7 +33,7 @@ class _EditProfileState extends State<EditProfile> {
     namecontroller = TextEditingController(text: widget.newUser.name);
     emailcontroller = TextEditingController(text: widget.newUser.email);
     passwordcontroller = TextEditingController(text: widget.newUser.password);
-    error = "";
+    aboutcontroller = TextEditingController(text: widget.newUser.about);
     _isNotVisible = true;
   }
 
@@ -118,34 +58,69 @@ class _EditProfileState extends State<EditProfile> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // batchUpdateComments(widget.newUser.id);
-            },
-            child: Text(
-              'Save',
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: 15,
-              ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              children: [
+                Center(
+                  child: Text(
+                    '.blog',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 80,
+                    ),
+                  ),
+                ),
+                fields(),
+              ],
             ),
+          ),
+          Row(
+            children: [
+              cancelBtn(),
+              saveBtn(),
+            ],
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          Center(
-            child: Text(
-              '.blog',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w900,
-                fontSize: 80,
-              ),
+    );
+  }
+
+  cancelBtn() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: TextButton(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            backgroundColor: Colors.transparent,
+            side: const BorderSide(
+              width: .5,
+              color: Colors.black38,
             ),
           ),
-          fields(),
-        ],
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.close,
+                size: 15,
+              ),
+              Text(
+                'Cancel',
+                style: GoogleFonts.poppins(),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -157,19 +132,31 @@ class _EditProfileState extends State<EditProfile> {
             formControl(
               'Name',
               false,
-              Icon(Icons.abc),
+              const Icon(Icons.abc),
               null,
               namecontroller,
               false,
+              1,
+            ),
+            const SizedBox(height: 10),
+            formControl(
+              'About',
+              false,
+              const Icon(Icons.description_outlined),
+              null,
+              aboutcontroller,
+              false,
+              null,
             ),
             const SizedBox(height: 10),
             formControl(
               'Email',
               false,
-              Icon(Icons.email_outlined),
+              const Icon(Icons.email_outlined),
               null,
               emailcontroller,
               true,
+              1,
             ),
             const SizedBox(height: 10),
             formControl(
@@ -184,7 +171,7 @@ class _EditProfileState extends State<EditProfile> {
                             _isNotVisible = !_isNotVisible;
                           });
                         },
-                        icon: Icon(Icons.key),
+                        icon: const Icon(Icons.key),
                       )
                     : IconButton(
                         onPressed: () {
@@ -192,59 +179,65 @@ class _EditProfileState extends State<EditProfile> {
                             _isNotVisible = !_isNotVisible;
                           });
                         },
-                        icon: Icon(Icons.key_off),
+                        icon: const Icon(Icons.key_off),
                       ),
               ),
               null,
               passwordcontroller,
-              false,
+              true,
+              1,
             ),
             const SizedBox(
               height: 10,
-            ),
-            Row(
-              children: [
-                saveBtn(),
-              ],
             ),
           ],
         ),
       );
 
-  Widget saveBtn() => Expanded(
-        child: TextButton(
-          onPressed: () {},
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+  saveBtn() => Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: TextButton(
+            onPressed: () {
+              showCustomDialog();
+            },
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backgroundColor: Colors.blueAccent,
+              side: const BorderSide(
+                width: .5,
+                color: Colors.black38,
+              ),
             ),
-            backgroundColor: Colors.blueAccent,
-            side: const BorderSide(
-              width: .5,
-              color: Colors.black38,
-            ),
-          ),
-          child: Text(
-            'Save',
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.save_outlined,
+                  size: 15,
+                  color: Colors.white,
+                ),
+                Text(
+                  'Save',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       );
 
-  Widget formControl(
-    String text,
-    bool invisibility,
-    icon,
-    validator,
-    controller,
-    readOnly,
-  ) =>
+  Widget formControl(String text, bool invisibility, icon, validator,
+          controller, readOnly, _maxlines) =>
       TextFormField(
+        maxLines: _maxlines,
         readOnly: readOnly,
         controller: controller,
         obscureText: invisibility,
@@ -270,34 +263,75 @@ class _EditProfileState extends State<EditProfile> {
         validator: validator,
       );
 
+  showCustomDialog() {
+    return showDialog(
+      context: context,
+      builder: (_) => customDialog(),
+    );
+  }
+
+  customDialog() {
+    return AlertDialog(
+      backgroundColor: Colors.black,
+      title: Text(
+        'Are you sure?',
+        style: GoogleFonts.poppins(),
+      ),
+      content: Text(
+        'This will update your information.',
+        style: GoogleFonts.poppins(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'Cancel',
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            updateUserInfo(user.uid);
+            Navigator.pop(context);
+          },
+          child: Text(
+            'Yes',
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+      ],
+    );
+  }
+
   Future updateUserInfo(id) async {
     final docUser = FirebaseFirestore.instance.collection('users').doc(id);
     await docUser.update({
       'password': passwordcontroller.text,
       'email': emailcontroller.text,
+      'about': aboutcontroller.text,
       'name': namecontroller.text,
     });
-    // Navigator.pop(context);
+
+    batchUpdateBlogAuthorInfo(id);
+    batchUpdateCommenterInfo(id);
+
+    Navigator.pop(context);
   }
 
-  Future updateUserProfilePic(id, profile) async {
-    final docUser = FirebaseFirestore.instance.collection('users').doc(id);
-    await docUser.update({
-      'userProfilePic': profile,
+  void _changePassword() async {
+    //Pass in the password to updatePassword.
+    user.updatePassword(passwordcontroller.text).then((_) {
+      print("Successfully changed password");
+      FirebaseAuth.instance.signOut();
+    }).catchError((error) {
+      print("Password can't be changed" + error.toString());
+      //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
     });
-    // Navigator.pop(context);
   }
 
-  Future updateUserCoverPic(id, cover) async {
-    final docUser = FirebaseFirestore.instance.collection('users').doc(id);
-    await docUser.update({
-      'userProfileCover': cover,
-    });
-    // Navigator.pop(context);
-  }
-
-  //this works
-  Future<void> batchUpdateComments(id) {
+  Future<void> batchUpdateCommenterInfo(id) {
     WriteBatch batch = FirebaseFirestore.instance.batch();
     final _doc = FirebaseFirestore.instance.collection('comments');
     final comments = FirebaseFirestore.instance
@@ -305,22 +339,26 @@ class _EditProfileState extends State<EditProfile> {
         .where('commenterId', isEqualTo: id);
     return comments.get().then((querySnapshot) {
       querySnapshot.docs.forEach((document) {
-        batch.update(
-            _doc.doc(document.id), {'commentername': namecontroller.text});
+        batch.update(_doc.doc(document.id), {
+          'commentername': namecontroller.text,
+        });
       });
 
       return batch.commit();
     });
   }
 
-  Future<void> batchUpdateBlogs(id) {
+  Future<void> batchUpdateBlogAuthorInfo(id) {
     WriteBatch batch = FirebaseFirestore.instance.batch();
+    final _doc = FirebaseFirestore.instance.collection('blogs');
     final comments = FirebaseFirestore.instance
-        .collection('comments')
-        .where('postId', isEqualTo: id);
+        .collection('blogs')
+        .where('userId', isEqualTo: id);
     return comments.get().then((querySnapshot) {
       querySnapshot.docs.forEach((document) {
-        batch.delete(document.reference);
+        batch.update(_doc.doc(document.id), {
+          'authorName': namecontroller.text,
+        });
       });
 
       return batch.commit();

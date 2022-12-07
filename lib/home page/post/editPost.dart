@@ -177,6 +177,7 @@ class _EditPostState extends State<EditPost> {
                 email: users['email'],
                 userProfilePic: users['userProfilePic'],
                 userProfileCover: users['userProfileCover'],
+                about: users['about'],
               );
               currentUserInfo = newUser;
               return (postField(newUser));

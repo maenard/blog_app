@@ -2,6 +2,7 @@ import 'package:blog_app/home%20page/blogComments/editComment.dart';
 import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/comments.dart';
 import 'package:blog_app/model/users.dart';
+import 'package:blog_app/timeDiff.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -131,7 +132,7 @@ class _UserCommentsState extends State<UserComments> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      DateFormat('MMM. dd, yyyy | EEE.').format(
+                      TimeDiff.getTimeDifferenceFromNow(
                         comments.commentime.toDate(),
                       ),
                       style: GoogleFonts.poppins(

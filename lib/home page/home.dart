@@ -4,6 +4,7 @@ import 'package:blog_app/home%20page/post/newPost.dart';
 import 'package:blog_app/home%20page/profile.dart';
 import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/users.dart';
+import 'package:blog_app/timeDiff.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -147,8 +148,9 @@ class _HomeState extends State<Home> {
                           overflow: TextOverflow.clip,
                         ),
                         Text(
-                          DateFormat('MMM. dd, yyyy | EEE.')
-                              .format(blogs.datePosted.toDate()),
+                          TimeDiff.getTimeDifferenceFromNow(
+                            blogs.datePosted.toDate(),
+                          ),
                           style: GoogleFonts.poppins(
                             color: Colors.white54,
                             fontSize: 12,
@@ -247,6 +249,7 @@ class _HomeState extends State<Home> {
                                 email: data['email'],
                                 userProfilePic: data['userProfilePic'],
                                 userProfileCover: data['userProfileCover'],
+                                about: data['about'],
                               );
 
                               Navigator.push(
