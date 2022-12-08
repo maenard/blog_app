@@ -59,7 +59,8 @@ class _NewPostState extends State<NewPost> {
                   ),
                 );
               } else {
-                addBlog();
+                final newPostCounts = widget.newUser.posts + 1;
+                addBlog(newPostCounts);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     duration: const Duration(seconds: 5),
@@ -151,7 +152,14 @@ class _NewPostState extends State<NewPost> {
         ],
       );
 
-  Future addBlog() async {
+  updateUserPostCount(id, postCount) {
+    final docUser = FirebaseFirestore.instance.collection('users').doc(id);
+    docUser.update({
+      'posts': postCount,
+    });
+  }
+
+  Future addBlog(postCount) async {
     final docUser = FirebaseFirestore.instance.collection('blogs').doc();
     final newUser = Blogs(
       postId: docUser.id,
@@ -167,6 +175,8 @@ class _NewPostState extends State<NewPost> {
 
     final json = newUser.toJson();
     await docUser.set(json);
+
+    updateUserPostCount(user.uid, postCount);
 
     setState(() {
       postcontroller.text = "";

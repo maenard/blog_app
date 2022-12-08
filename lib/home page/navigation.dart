@@ -16,7 +16,7 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   final currentUser = FirebaseAuth.instance.currentUser!;
-  int navBarIndex = 1;
+  int navBarIndex = 0;
   screens() => [
         const Profile(),
         const Home(),
@@ -97,10 +97,16 @@ class _NavigationState extends State<Navigation> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return CircleAvatar(
-            backgroundImage: NetworkImage(snapshot.data?['userProfilePic']),
-            radius: 15,
-          );
+          return snapshot.data?['userProfilePic'] != '-'
+              ? CircleAvatar(
+                  backgroundImage:
+                      NetworkImage(snapshot.data?['userProfilePic']),
+                  radius: 15,
+                )
+              : CircleAvatar(
+                  backgroundImage:
+                      AssetImage('assets/images/blank_profile.jpg'),
+                  radius: 15);
         } else {
           return const Icon(Icons.person);
         }

@@ -245,6 +245,9 @@ class _HomeState extends State<Home> {
                                 userProfilePic: data['userProfilePic'],
                                 userProfileCover: data['userProfileCover'],
                                 about: data['about'],
+                                followers: data['followers'],
+                                followerCount: data['followerCount'],
+                                posts: data['posts'],
                               );
 
                               Navigator.push(

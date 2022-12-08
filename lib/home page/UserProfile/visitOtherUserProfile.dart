@@ -242,6 +242,9 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
                                 userProfilePic: data['userProfilePic'],
                                 userProfileCover: data['userProfileCover'],
                                 about: data['about'],
+                                followers: data['followers'],
+                                followerCount: data['followerCount'],
+                                posts: data['posts'],
                               );
 
                               Navigator.push(
@@ -330,79 +333,6 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
         ],
       );
 
-  aboutAndPost(text) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Text(
-          text,
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        const Expanded(
-          child: Divider(
-            color: Colors.white,
-            indent: 10,
-          ),
-        ),
-      ],
-    );
-  }
-
-  postField(Users newUser) => Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            backgroundImage: newUser.userProfilePic == "-"
-                ? imgNotExist()
-                : imgExist(newUser.userProfilePic),
-            radius: 18,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: SizedBox(
-              height: 40,
-              child: TextField(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: ((context) => NewPost(
-                          newUser: newUser,
-                        )),
-                  ),
-                ),
-                readOnly: true,
-                obscureText: false,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.only(
-                    left: 20,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white10,
-                  errorStyle: GoogleFonts.poppins(
-                    fontSize: 12,
-                    height: 0,
-                    fontStyle: FontStyle.italic,
-                  ),
-                  hintText: "What's on your mind...?",
-                  hintStyle: GoogleFonts.poppins(
-                    fontSize: 13,
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-
   imgNotExist() => const AssetImage('assets/images/blank_profile.jpg');
   imgExist(img) => NetworkImage(img);
 
@@ -444,6 +374,63 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
                 height: .9,
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${newUser.posts}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  ' ${postGrammar(newUser)} •',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  ' ${newUser.followerCount}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  ' ${followerGrammar(newUser)}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+            GestureDetector(
+              onTap: () {
+                if (newUser.followers!.contains(user.uid)) {
+                  final newFollowers = newUser.followers;
+                  final newFollowersCount = newUser.followers!.length - 1;
+                  newFollowers!.remove(user.uid);
+                  updateUserFollowerCount(
+                      widget.id, newFollowersCount, newFollowers);
+                } else {
+                  final newFollowers = newUser.followers;
+                  final newFollowersCount = newUser.followers!.length + 1;
+                  newFollowers!.add(user.uid);
+                  updateUserFollowerCount(
+                      widget.id, newFollowersCount, newFollowers);
+                }
+              },
+              child: Text(
+                newUser.followers.contains(user.uid) ? 'Unfollow' : 'Follow',
+                style: GoogleFonts.poppins(
+                  color: Colors.blueAccent,
+                  fontSize: 15,
+                ),
+              ),
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -462,6 +449,21 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
           ],
         ),
       );
+  postGrammar(Users newUser) {
+    if (newUser.posts <= 1) {
+      return 'Post';
+    } else {
+      return 'Posts';
+    }
+  }
+
+  followerGrammar(Users newUser) {
+    if (newUser.followerCount <= 1) {
+      return 'Follower';
+    } else {
+      return 'Followers';
+    }
+  }
 
   userProfilePic(Users newUser) {
     return Positioned(
@@ -487,6 +489,14 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
         ),
       ),
     );
+  }
+
+  updateUserFollowerCount(id, followerCount, followers) {
+    final docUser = FirebaseFirestore.instance.collection('users').doc(id);
+    docUser.update({
+      'followerCount': followerCount,
+      'followers': followers,
+    });
   }
 
   userNoCoverPhoto(Users newUser) {

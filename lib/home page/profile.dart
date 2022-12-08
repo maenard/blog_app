@@ -275,6 +275,9 @@ class _ProfileState extends State<Profile> {
                                 userProfilePic: data['userProfilePic'],
                                 userProfileCover: data['userProfileCover'],
                                 about: data['about'],
+                                followers: data['followers'],
+                                followerCount: data['followerCount'],
+                                posts: data['posts'],
                               );
 
                               Navigator.push(
@@ -337,9 +340,15 @@ class _ProfileState extends State<Profile> {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
+              final userPost =
+                  FirebaseFirestore.instance.collection('users').doc(user.uid);
+              var newPostCount = 0;
+              var getPostCount = await userPost
+                  .get()
+                  .then((value) => newPostCount = value.get('posts') - 1);
               batchDeleteComments(blogs.postId);
-              deleteBlog(blogs.postId);
+              deleteBlog(blogs.postId, newPostCount, user.uid);
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -446,27 +455,6 @@ class _ProfileState extends State<Profile> {
         ),
       );
 
-  aboutAndPost(text) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Text(
-          text,
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        const Expanded(
-          child: Divider(
-            color: Colors.white,
-            indent: 10,
-          ),
-        ),
-      ],
-    );
-  }
-
   postField(Users newUser) => Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -560,6 +548,39 @@ class _ProfileState extends State<Profile> {
                 height: .9,
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${newUser.posts}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  ' ${postGrammar(newUser)} •',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  ' ${newUser.followerCount}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  ' ${followerGrammar(newUser)}',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white54,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -595,6 +616,22 @@ class _ProfileState extends State<Profile> {
           ],
         ),
       );
+
+  postGrammar(Users newUser) {
+    if (newUser.posts <= 1) {
+      return 'Post';
+    } else {
+      return 'Posts';
+    }
+  }
+
+  followerGrammar(Users newUser) {
+    if (newUser.followerCount <= 1) {
+      return 'Follower';
+    } else {
+      return 'Followers';
+    }
+  }
 
   userProfilePic(Users newUser) {
     return Positioned(
@@ -737,9 +774,17 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  deleteBlog(id) {
+  updateUserPostCount(id, postCount) {
+    final docUser = FirebaseFirestore.instance.collection('users').doc(id);
+    docUser.update({
+      'posts': postCount,
+    });
+  }
+
+  deleteBlog(id, postCount, userId) {
     final docUser = FirebaseFirestore.instance.collection('blogs').doc(id);
     docUser.delete();
+    updateUserPostCount(userId, postCount);
   }
 
   Stream<List<Blogs>> readPosts() => FirebaseFirestore.instance

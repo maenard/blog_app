@@ -349,6 +349,9 @@ class _RegisterState extends State<Register> {
       userProfilePic: '-',
       userProfileCover: '-',
       about: '',
+      followerCount: 0,
+      followers: [],
+      posts: 0,
     );
 
     final json = newUser.toJson();
