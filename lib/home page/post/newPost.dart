@@ -48,7 +48,7 @@ class _NewPostState extends State<NewPost> {
         actions: [
           IconButton(
             onPressed: () {
-              if (postcontroller.text.isEmpty) {
+              if (postcontroller.text.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     duration: const Duration(seconds: 5),
@@ -97,22 +97,6 @@ class _NewPostState extends State<NewPost> {
         children: [
           userInfo(user),
           TextField(
-            onChanged: (value) => {
-              if (postcontroller.text.isEmpty)
-                {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: const Duration(seconds: 5),
-                      content: Text(
-                        "Please fill out this field",
-                        style: GoogleFonts.poppins(),
-                      ),
-                    ),
-                  ),
-                }
-              else
-                {}
-            },
             maxLines: null,
             scrollPadding: const EdgeInsets.only(bottom: 50),
             controller: postcontroller,

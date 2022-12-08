@@ -226,6 +226,12 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
       'userProfilePic': img,
     });
     Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        duration: Duration(seconds: 5),
+        content: Text('Profile photo uploaded successfully.'),
+      ),
+    );
   }
 
   Future<void> batchUpdateCommenterImg(id, imgUrl) {

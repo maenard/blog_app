@@ -53,11 +53,20 @@ class _VerifyEmailState extends State<VerifyEmail> {
       final user = FirebaseAuth.instance.currentUser!;
       await user.sendEmailVerification();
 
-      setState(() => canResendEmail = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Verification email sent.'),
+        ),
+      );
+      setState(() {
+        canResendEmail = false;
+      });
       await Future.delayed(Duration(
         seconds: 5,
       ));
-      setState(() => canResendEmail = true);
+      setState(() {
+        canResendEmail = true;
+      });
     } catch (e) {
       print(e);
     }
@@ -123,12 +132,11 @@ class _VerifyEmailState extends State<VerifyEmail> {
                 canResendEmail
                     ? sendVerificationEmail()
                     : ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text(
                               'Please wait for a few second for another verification email. Thank you!'),
                         ),
                       );
-                ;
               },
               style: TextButton.styleFrom(
                 padding:

@@ -295,6 +295,12 @@ class _EditProfileState extends State<EditProfile> {
           onPressed: () {
             updateUserInfo(user.uid);
             Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                duration: Duration(seconds: 5),
+                content: Text('You have successfully updated your profile.'),
+              ),
+            );
           },
           child: Text(
             'Yes',

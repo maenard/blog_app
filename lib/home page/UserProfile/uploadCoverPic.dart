@@ -225,5 +225,11 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
       'userProfileCover': img,
     });
     Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        duration: Duration(seconds: 5),
+        content: Text('Cover photo uploaded successfully.'),
+      ),
+    );
   }
 }

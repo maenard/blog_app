@@ -13,6 +13,12 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   final formKey = GlobalKey<FormState>();
   final emailcontroller = TextEditingController();
+  bool canReSendResetPassEmail = true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +40,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         key: formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Center(
             child: SingleChildScrollView(
               child: Container(
@@ -119,7 +125,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               onPressed: () {
                 final isValidForm = formKey.currentState!.validate();
                 if (isValidForm == true) {
-                  resetPassword();
+                  canReSendResetPassEmail
+                      ? resetPassword()
+                      : ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Please wait for a few second for another reset passsword email. Thank you!'),
+                          ),
+                        );
                 }
               },
               style: TextButton.styleFrom(
@@ -157,25 +170,26 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       );
 
   Future resetPassword() async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator.adaptive(
-          valueColor: AlwaysStoppedAnimation(Colors.white),
-        ),
-      ),
-    );
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: emailcontroller.text.trim(),
       );
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Password Reset Email Sent'),
         ),
       );
-      Navigator.of(context).pop();
+
+      setState(() {
+        canReSendResetPassEmail = false;
+      });
+      await Future.delayed(Duration(
+        seconds: 5,
+      ));
+      setState(() {
+        canReSendResetPassEmail = true;
+      });
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

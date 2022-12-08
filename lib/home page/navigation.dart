@@ -103,7 +103,7 @@ class _NavigationState extends State<Navigation> {
                       NetworkImage(snapshot.data?['userProfilePic']),
                   radius: 15,
                 )
-              : CircleAvatar(
+              : const CircleAvatar(
                   backgroundImage:
                       AssetImage('assets/images/blank_profile.jpg'),
                   radius: 15);

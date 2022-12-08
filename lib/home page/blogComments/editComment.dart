@@ -45,7 +45,7 @@ class _EditCommentsState extends State<EditComments> {
         actions: [
           IconButton(
             onPressed: () {
-              if (commentController.text.isEmpty) {
+              if (commentController.text.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     duration: const Duration(seconds: 5),
