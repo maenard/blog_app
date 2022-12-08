@@ -38,7 +38,7 @@ class _NavigationState extends State<Navigation> {
         actions: [
           TextButton(
             onPressed: () {
-              FirebaseAuth.instance.signOut();
+              showCustomDialog();
             },
             child: Text(
               'Sign out',
@@ -105,6 +105,44 @@ class _NavigationState extends State<Navigation> {
           return const Icon(Icons.person);
         }
       },
+    );
+  }
+
+  customDialog() {
+    return AlertDialog(
+      backgroundColor: Colors.black,
+      content: Text(
+        'Are you sure you wan to sign out?',
+        style: GoogleFonts.poppins(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'No',
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            FirebaseAuth.instance.signOut();
+            Navigator.pop(context);
+          },
+          child: Text(
+            'Yes',
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  showCustomDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) => customDialog(),
     );
   }
 }

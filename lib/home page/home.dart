@@ -22,14 +22,10 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final user = FirebaseAuth.instance.currentUser!;
-  // late String currentUserName;
-  // late String userId;
 
   @override
   void initState() {
     super.initState();
-    // currentUserName = "";
-    // userId = "";
   }
 
   @override
