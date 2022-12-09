@@ -388,5 +388,17 @@ class _LoginState extends State<Login> {
       );
     }
     Navigator.pop(context);
+
+    if (error == '') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 5),
+          content: Text(
+            'You have successfully logged in to your account.',
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+      );
+    }
   }
 }
