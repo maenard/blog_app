@@ -295,12 +295,8 @@ class _EditProfileState extends State<EditProfile> {
           onPressed: () {
             updateUserInfo(user.uid);
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                duration: Duration(seconds: 5),
-                content: Text('You have successfully updated your profile.'),
-              ),
-            );
+            customSnackbar(
+                Icons.check, 'You have successfully updated your profile.');
           },
           child: Text(
             'Yes',
@@ -308,6 +304,31 @@ class _EditProfileState extends State<EditProfile> {
           ),
         ),
       ],
+    );
+  }
+
+  customSnackbar(icon, msg) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
