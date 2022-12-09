@@ -105,220 +105,265 @@ class _ProfileState extends State<Profile> {
             height: 10,
           ),
           Container(
-            padding: const EdgeInsets.only(
-              right: 20,
-              left: 20,
-              top: 10,
-            ),
-            color: Color.fromARGB(39, 158, 158, 158),
+            color: const Color.fromARGB(39, 158, 158, 158),
             width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: blogs.authorPic == "-"
-                          ? imgNotExist()
-                          : imgExist(blogs.authorPic),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          blogs.authorName,
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                          overflow: TextOverflow.clip,
-                        ),
-                        Text(
-                          TimeDiff().getTimeDifferenceFromNow(
-                            blogs.datePosted.toDate(),
-                          ),
-                          style: GoogleFonts.poppins(
-                            color: Colors.white54,
-                            fontSize: 12,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Expanded(child: SizedBox()),
-                    SizedBox(
-                      width: 20,
-                      child: PopupMenuButton(
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditPost(blogs: blogs),
-                              ),
-                            );
-                          } else {
-                            _showdialog(blogs);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Text(
-                              'Edit',
-                              style: GoogleFonts.poppins(),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    right: 20,
+                    top: 15,
+                    left: 20,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: blogs.authorPic == "-"
+                            ? imgNotExist()
+                            : imgExist(blogs.authorPic),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            blogs.authorName,
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
                             ),
+                            overflow: TextOverflow.clip,
                           ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Text(
-                              'Delete',
-                              style: GoogleFonts.poppins(),
+                          Text(
+                            TimeDiff().getTimeDifferenceFromNow(
+                              blogs.datePosted.toDate(),
+                            ),
+                            style: GoogleFonts.poppins(
+                              color: Colors.white54,
+                              fontSize: 12,
+                              height: 1.5,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        blogs.content,
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          height: 1.5,
-                        ),
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      ' ${blogs.likesCount.toString()} ${likeGrammar(blogs.likesCount)} •',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white54,
-                        fontSize: 12,
-                      ),
-                    ),
-                    Text(
-                      ' ${blogs.totalComments} ${commentGrammar(blogs.totalComments)}',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white54,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Divider(
-                  height: .9,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          if (blogs.likes!.contains(user.uid)) {
-                            final newLikes = blogs.likes;
-                            final newLikesCount = blogs.likes!.length - 1;
-                            newLikes!.remove(user.uid);
-                            updateBlog(blogs.postId, newLikes, newLikesCount);
-                          } else {
-                            final newLikes = blogs.likes;
-                            final newLikesCount = blogs.likes!.length + 1;
-                            newLikes!.add(user.uid);
-                            updateBlog(blogs.postId, newLikes, newLikesCount);
-                          }
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            blogs.likes!.contains(user.uid)
-                                ? liked()
-                                : notLiked(),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          final db = FirebaseFirestore.instance;
-                          final docRef = db.collection("users").doc(user.uid);
-                          docRef.get().then(
-                            (DocumentSnapshot doc) {
-                              final data = doc.data() as Map<String, dynamic>;
-                              final newUser = Users(
-                                id: data['id'],
-                                name: data['name'],
-                                password: data['password'],
-                                email: data['email'],
-                                userProfilePic: data['userProfilePic'],
-                                userProfileCover: data['userProfileCover'],
-                                about: data['about'],
-                                followers: data['followers'],
-                                followerCount: data['followerCount'],
-                                posts: data['posts'],
-                              );
-
+                      const Expanded(child: SizedBox()),
+                      SizedBox(
+                        width: 20,
+                        child: PopupMenuButton(
+                          onSelected: (value) {
+                            if (value == 'edit') {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => UserComments(
-                                    blogs: blogs,
-                                    users: newUser,
-                                  ),
+                                  builder: (context) => EditPost(blogs: blogs),
                                 ),
                               );
-                            },
-                            onError: (e) => print("Error getting document: $e"),
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.message_outlined,
-                              color: Colors.white54,
+                            } else {
+                              _showdialog(blogs);
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 'edit',
+                              child: Text(
+                                'Edit',
+                                style: GoogleFonts.poppins(),
+                              ),
                             ),
-                            Text(
-                              " Comment",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white54,
-                                fontSize: 12,
-                                // height: 3.5,
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Text(
+                                'Delete',
+                                style: GoogleFonts.poppins(),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    right: 20,
+                    left: 20,
+                  ),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          blogs.content,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            height: 1.5,
+                          ),
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                blogs.blogPhoto == '-' ? Container() : blogHasPhoto(blogs),
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    right: 20,
+                    left: 20,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        ' ${blogs.likesCount.toString()} ${likeGrammar(blogs.likesCount)} •',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white54,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        ' ${blogs.totalComments} ${commentGrammar(blogs.totalComments)}',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white54,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(
+                    right: 20,
+                    left: 20,
+                  ),
+                  child: Divider(
+                    height: .9,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    right: 20,
+                    left: 20,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            if (blogs.likes!.contains(user.uid)) {
+                              final newLikes = blogs.likes;
+                              final newLikesCount = blogs.likes!.length - 1;
+                              newLikes!.remove(user.uid);
+                              updateBlog(blogs.postId, newLikes, newLikesCount);
+                            } else {
+                              final newLikes = blogs.likes;
+                              final newLikesCount = blogs.likes!.length + 1;
+                              newLikes!.add(user.uid);
+                              updateBlog(blogs.postId, newLikes, newLikesCount);
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              blogs.likes!.contains(user.uid)
+                                  ? liked()
+                                  : notLiked(),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            final db = FirebaseFirestore.instance;
+                            final docRef = db.collection("users").doc(user.uid);
+                            docRef.get().then(
+                              (DocumentSnapshot doc) {
+                                final data = doc.data() as Map<String, dynamic>;
+                                final newUser = Users(
+                                  id: data['id'],
+                                  name: data['name'],
+                                  password: data['password'],
+                                  email: data['email'],
+                                  userProfilePic: data['userProfilePic'],
+                                  userProfileCover: data['userProfileCover'],
+                                  about: data['about'],
+                                  followers: data['followers'],
+                                  followerCount: data['followerCount'],
+                                  posts: data['posts'],
+                                );
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserComments(
+                                      blogs: blogs,
+                                      users: newUser,
+                                    ),
+                                  ),
+                                );
+                              },
+                              onError: (e) =>
+                                  print("Error getting document: $e"),
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.message_outlined,
+                                color: Colors.white54,
+                              ),
+                              Text(
+                                " Comment",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white54,
+                                  fontSize: 12,
+                                  // height: 3.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ],
       );
+
+  blogHasPhoto(Blogs blogs) {
+    return ClipRect(
+      child: Container(
+        color: Colors.white12,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height * .30,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: Image.network(blogs.blogPhoto),
+        ),
+      ),
+    );
+  }
 
   _popUpDialog(Blogs blogs) => AlertDialog(
         title: Text(
@@ -341,6 +386,9 @@ class _ProfileState extends State<Profile> {
           ),
           TextButton(
             onPressed: () async {
+              blogs.blogPhoto != '-'
+                  ? deleteBlogPic(blogs.blogPhoto)
+                  : print('blog has no pic');
               final userPost =
                   FirebaseFirestore.instance.collection('users').doc(user.uid);
               var newPostCount = 0;
@@ -779,6 +827,11 @@ class _ProfileState extends State<Profile> {
     docUser.update({
       'posts': postCount,
     });
+  }
+
+  deleteBlogPic(url) {
+    var ref = FirebaseStorage.instance.refFromURL(url);
+    ref.delete();
   }
 
   deleteBlog(id, postCount, userId) {

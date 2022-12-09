@@ -51,7 +51,7 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
   }
 
   Future uploadCover() async {
-    final path = 'files/${generateRandomString(8)}';
+    final path = 'userCoverPics/${generateRandomString(8)}';
     print('update path Link: $path');
     final file = File(pickedCover!.path!);
     final ref = FirebaseStorage.instance.ref().child(path);
@@ -117,7 +117,15 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
                   'Upload',
                   Colors.blueAccent,
                   () {
-                    pickedCover == null ? snackBarError() : uploadCover();
+                    if (pickedCover == null) {
+                      snackBarError();
+                    } else {
+                      widget.newUser.userProfileCover != '-'
+                          ? deleteCoverPic(widget.newUser.userProfileCover)
+                          : print('user has no cover photo');
+                      uploadCover();
+                    }
+                    ;
                   },
                 ),
               ],
@@ -217,6 +225,11 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
         : Container(
             child: Image.network(newUser.userProfileCover),
           );
+  }
+
+  deleteCoverPic(url) {
+    var ref = FirebaseStorage.instance.refFromURL(url);
+    ref.delete();
   }
 
   Future updateUserProfileCover(id, img) async {

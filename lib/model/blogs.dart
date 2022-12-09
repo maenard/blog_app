@@ -8,6 +8,7 @@ class Blogs {
   final List? likes;
   final likesCount;
   final totalComments;
+  final blogPhoto;
 
   Blogs({
     required this.postId,
@@ -16,6 +17,7 @@ class Blogs {
     required this.datePosted,
     required this.authorName,
     required this.authorPic,
+    required this.blogPhoto,
     this.likes,
     this.likesCount,
     this.totalComments,
@@ -31,6 +33,7 @@ class Blogs {
         'likes': likes,
         'likesCount': likesCount,
         'totalComments': totalComments,
+        'blogPhoto': blogPhoto,
       };
 
   static Blogs fromJson(Map<String, dynamic> json) => Blogs(
@@ -43,5 +46,6 @@ class Blogs {
         likes: json['likes'],
         likesCount: json['likesCount'],
         totalComments: json['totalComments'],
+        blogPhoto: json['blogPhoto'],
       );
 }

@@ -50,7 +50,7 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
   }
 
   Future uploadProfile() async {
-    final path = 'files/${generateRandomString(8)}';
+    final path = 'userProfilePics/${generateRandomString(8)}';
     print('update path Link: $path');
     final file = File(pickedProfile!.path!);
     final ref = FirebaseStorage.instance.ref().child(path);
@@ -118,7 +118,14 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
                   'Upload',
                   Colors.blueAccent,
                   () {
-                    pickedProfile == null ? snackBarError() : uploadProfile();
+                    if (pickedProfile == null) {
+                      snackBarError();
+                    } else {
+                      widget.newUser.userProfilePic != '-'
+                          ? deleteProfilePic(widget.newUser.userProfilePic)
+                          : print('user has no profile');
+                      uploadProfile();
+                    }
                   },
                 ),
               ],
@@ -218,6 +225,11 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
             backgroundImage: NetworkImage(newUser.userProfilePic),
             radius: 150,
           );
+  }
+
+  deleteProfilePic(url) {
+    var ref = FirebaseStorage.instance.refFromURL(url);
+    ref.delete();
   }
 
   Future updateUserProfilePic(id, img) async {

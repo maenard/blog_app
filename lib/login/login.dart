@@ -372,33 +372,55 @@ class _LoginState extends State<Login> {
         email: _emailController.text.trim(),
         password: _passController.text.trim(),
       );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 5),
+          content: Row(
+            children: [
+              const Icon(
+                Icons.check,
+                color: Colors.black,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Flexible(
+                child: Text(
+                  'You have successfully logged in to your account.',
+                  style: GoogleFonts.poppins(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     } on FirebaseAuthException catch (e) {
-      print(e);
       setState(() {
         error = e.message.toString();
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           duration: Duration(seconds: 5),
-          content: Text(
-            error,
-            style: GoogleFonts.poppins(),
+          content: Row(
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Colors.black,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Flexible(
+                child: Text(
+                  error,
+                  style: GoogleFonts.poppins(),
+                ),
+              ),
+            ],
           ),
         ),
       );
     }
-    Navigator.pop(context);
-
-    if (error == '') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          duration: Duration(seconds: 5),
-          content: Text(
-            'You have successfully logged in to your account.',
-            style: GoogleFonts.poppins(),
-          ),
-        ),
-      );
-    }
+    Navigator.of(context).pop();
   }
 }
