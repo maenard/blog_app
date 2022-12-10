@@ -27,7 +27,7 @@ class _NavigationState extends State<Navigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(39, 158, 158, 158),
+        backgroundColor: const Color.fromARGB(39, 158, 158, 158),
         elevation: 0,
         title: Text(
           '.blog',
@@ -135,6 +135,8 @@ class _NavigationState extends State<Navigation> {
           onPressed: () {
             FirebaseAuth.instance.signOut();
             Navigator.pop(context);
+            customSnackBar(
+                Icons.check, 'You have successfully signed out your account');
           },
           child: Text(
             'Yes',
@@ -149,6 +151,31 @@ class _NavigationState extends State<Navigation> {
     return showDialog(
       context: context,
       builder: (context) => customDialog(),
+    );
+  }
+
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

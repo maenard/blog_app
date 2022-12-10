@@ -199,7 +199,12 @@ class _EditProfileState extends State<EditProfile> {
           padding: const EdgeInsets.all(20),
           child: TextButton(
             onPressed: () {
-              showCustomDialog();
+              if (namecontroller.text.trim().isEmpty) {
+                customSnackbar(
+                    Icons.error_outline, 'Name should not be empty.');
+              } else {
+                showCustomDialog();
+              }
             },
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),

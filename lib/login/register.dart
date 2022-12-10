@@ -65,7 +65,7 @@ class _RegisterState extends State<Register> {
                   false,
                   const Icon(Icons.person_outline_rounded),
                   (name) {
-                    if (name != null && name.length < 1) {
+                    if (name.trim() == '') {
                       return 'Fill out this field';
                     } else {
                       return null;

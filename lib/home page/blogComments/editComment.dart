@@ -46,26 +46,9 @@ class _EditCommentsState extends State<EditComments> {
           IconButton(
             onPressed: () {
               if (commentController.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    duration: const Duration(seconds: 5),
-                    content: Text(
-                      "Your comment is empty!",
-                      style: GoogleFonts.poppins(),
-                    ),
-                  ),
-                );
+                customSnackBar(Icons.error_outline, 'Your comment is empty.');
               } else {
-                updateComment(widget.comments.commentId);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    duration: const Duration(seconds: 5),
-                    content: Text(
-                      "Comment Updated Successfuly!",
-                      style: GoogleFonts.poppins(),
-                    ),
-                  ),
-                );
+                showCustomDialog();
               }
             },
             icon: const Icon(Icons.save),
@@ -86,27 +69,52 @@ class _EditCommentsState extends State<EditComments> {
     );
   }
 
+  showCustomDialog() {
+    return showDialog(context: context, builder: (context) => customDialog());
+  }
+
+  customDialog() {
+    return AlertDialog(
+      backgroundColor: Colors.black,
+      title: Text(
+        'Are you sure?',
+        style: GoogleFonts.poppins(),
+      ),
+      content: Text(
+        'This will update your comment.',
+        style: GoogleFonts.poppins(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'No',
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            updateComment(widget.comments.commentId);
+            Navigator.pop(context);
+            customSnackBar(
+                Icons.check, 'You have successfully updated your comment.');
+          },
+          child: Text(
+            'Yes',
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget postField(Comments comments) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           userInfo(comments),
           TextField(
-            onChanged: (value) => {
-              if (commentController.text.isEmpty)
-                {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: const Duration(seconds: 5),
-                      content: Text(
-                        "Please fill out this field",
-                        style: GoogleFonts.poppins(),
-                      ),
-                    ),
-                  ),
-                }
-              else
-                {}
-            },
             maxLines: null,
             scrollPadding: const EdgeInsets.only(bottom: 50),
             controller: commentController,
@@ -145,6 +153,31 @@ class _EditCommentsState extends State<EditComments> {
           ),
         ],
       );
+
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   updateComment(id) {
     final docUser = FirebaseFirestore.instance.collection('comments').doc(id);

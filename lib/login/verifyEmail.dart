@@ -45,7 +45,10 @@ class _VerifyEmailState extends State<VerifyEmail> {
     setState(() {
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
-    if (isEmailVerified) timer?.cancel();
+    if (isEmailVerified) {
+      timer?.cancel();
+      customSnackBar(Icons.check, 'Email verified. Welcome new user.');
+    }
   }
 
   Future sendVerificationEmail() async {
@@ -53,20 +56,24 @@ class _VerifyEmailState extends State<VerifyEmail> {
       final user = FirebaseAuth.instance.currentUser!;
       await user.sendEmailVerification();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Verification email sent.'),
-        ),
+      customSnackBar(
+        Icons.email_outlined,
+        'Verification email sent to ${user.email}.',
       );
       setState(() {
         canResendEmail = false;
       });
-      await Future.delayed(Duration(
-        seconds: 5,
-      ));
-      setState(() {
-        canResendEmail = true;
-      });
+      await Future.delayed(
+        Duration(
+          seconds: 60,
+        ),
+        () {
+          setState(() {
+            canResendEmail = true;
+          });
+          print(canResendEmail.toString());
+        },
+      );
     } catch (e) {
       print(e);
     }
@@ -131,11 +138,9 @@ class _VerifyEmailState extends State<VerifyEmail> {
               onPressed: () {
                 canResendEmail
                     ? sendVerificationEmail()
-                    : ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                              'Please wait for a few second for another verification email. Thank you!'),
-                        ),
+                    : customSnackBar(
+                        Icons.error_outline,
+                        'Please wait for a few second for another verification email. Thank you!',
                       );
               },
               style: TextButton.styleFrom(
@@ -171,4 +176,29 @@ class _VerifyEmailState extends State<VerifyEmail> {
           ),
         ],
       );
+
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

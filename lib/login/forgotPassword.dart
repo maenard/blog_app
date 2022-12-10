@@ -174,30 +174,35 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: emailcontroller.text.trim(),
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password Reset Email Sent'),
-        ),
-      );
-
-      setState(() {
-        canReSendResetPassEmail = false;
-      });
-      await Future.delayed(Duration(
-        seconds: 5,
-      ));
-      setState(() {
-        canReSendResetPassEmail = true;
-      });
+      customSnackBar(Icons.email, 'Password reset email sent.');
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message.toString()),
-        ),
-      );
-
-      Navigator.of(context).pop();
+      customSnackBar(Icons.error_outline, e.message);
     }
+  }
+
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

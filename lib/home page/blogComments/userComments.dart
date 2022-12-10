@@ -225,15 +225,11 @@ class _UserCommentsState extends State<UserComments> {
               deleteComment(comments.commentId);
               updateCommentsCount(widget.blogs.postId, newCommentCount);
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  duration: const Duration(seconds: 5),
-                  content: Text(
-                    "Your comment was deleted!",
-                    style: GoogleFonts.poppins(),
-                  ),
-                ),
-              );
+              user.uid == widget.blogs.userId
+                  ? customSnackBar(Icons.check,
+                      'You have successfully deleted your comment on your blog.')
+                  : customSnackBar(Icons.check,
+                      'You have successfully deleted your comment on ${widget.blogs.authorName}\'s blog.');
               Navigator.pop(context);
             },
             child: Text(
@@ -299,6 +295,11 @@ class _UserCommentsState extends State<UserComments> {
                 createComment();
                 updateCommentsCount(widget.blogs.postId, newCommentCount);
                 Navigator.pop(context);
+                user.uid == widget.blogs.userId
+                    ? customSnackBar(Icons.check,
+                        'You have successfully commented at your own blog.')
+                    : customSnackBar(Icons.check,
+                        'You have successfully commented at ${widget.blogs.authorName}\'s blog.');
               }
             },
             icon: const Icon(Icons.send),
@@ -334,6 +335,31 @@ class _UserCommentsState extends State<UserComments> {
           );
         }
       },
+    );
+  }
+
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

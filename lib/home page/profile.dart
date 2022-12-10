@@ -398,15 +398,8 @@ class _ProfileState extends State<Profile> {
               batchDeleteComments(blogs.postId);
               deleteBlog(blogs.postId, newPostCount, user.uid);
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  duration: const Duration(seconds: 5),
-                  content: Text(
-                    "Your blog is deleted!",
-                    style: GoogleFonts.poppins(),
-                  ),
-                ),
-              );
+              customSnackBar(
+                  Icons.check, 'You have successfully deleted your blog.');
             },
             child: Text(
               'Yes',
@@ -793,6 +786,31 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
             ),
           ],
         ),
