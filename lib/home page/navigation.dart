@@ -16,7 +16,7 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   final currentUser = FirebaseAuth.instance.currentUser!;
-  int navBarIndex = 0;
+  int navBarIndex = 1;
   screens() => [
         const Profile(),
         const Home(),
@@ -118,7 +118,7 @@ class _NavigationState extends State<Navigation> {
     return AlertDialog(
       backgroundColor: Colors.black,
       content: Text(
-        'Are you sure you wan to sign out?',
+        'Are you sure you want to sign out?',
         style: GoogleFonts.poppins(),
       ),
       actions: [
@@ -127,7 +127,7 @@ class _NavigationState extends State<Navigation> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'No',
+            'Cancel',
             style: GoogleFonts.poppins(),
           ),
         ),
@@ -139,8 +139,8 @@ class _NavigationState extends State<Navigation> {
                 Icons.check, 'You have successfully signed out your account');
           },
           child: Text(
-            'Yes',
-            style: GoogleFonts.poppins(),
+            'Sign out',
+            style: GoogleFonts.poppins(color: Colors.blueAccent),
           ),
         ),
       ],

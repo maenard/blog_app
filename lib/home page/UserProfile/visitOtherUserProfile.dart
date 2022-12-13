@@ -4,6 +4,7 @@ import 'package:blog_app/home%20page/UserProfile/uploadProfilePic.dart';
 import 'package:blog_app/home%20page/blogComments/userComments.dart';
 import 'package:blog_app/home%20page/post/editPost.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
+import 'package:blog_app/home%20page/viewPhotos.dart';
 import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/users.dart';
 import 'package:blog_app/timeDiff.dart';
@@ -319,14 +320,24 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
       );
 
   blogHasPhoto(Blogs blogs) {
-    return ClipRect(
-      child: Container(
-        color: Colors.white12,
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .30,
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: Image.network(blogs.blogPhoto),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViewPhotos(img: blogs.blogPhoto),
+          ),
+        );
+      },
+      child: ClipRect(
+        child: Container(
+          color: Colors.white12,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * .30,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: Image.network(blogs.blogPhoto),
+          ),
         ),
       ),
     );
@@ -351,7 +362,7 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
   liked() => Row(
         children: [
           const Icon(
-            Icons.thumb_up_sharp,
+            Icons.thumb_up_alt,
             color: Colors.blueAccent,
           ),
           Text(
@@ -363,7 +374,7 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
   notLiked() => Row(
         children: [
           const Icon(
-            Icons.thumb_up_sharp,
+            Icons.thumb_up_alt,
             color: Colors.white54,
           ),
           Text(
@@ -514,24 +525,44 @@ class _VisitOtherUserProfileState extends State<VisitOtherUserProfile> {
   userProfilePic(Users newUser) {
     return Positioned(
       bottom: -70,
-      child: CircleAvatar(
-        backgroundImage: newUser.userProfilePic == "-"
-            ? imgNotExist()
-            : imgExist(newUser.userProfilePic),
-        radius: 70,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ViewPhotos(img: newUser.userProfilePic),
+            ),
+          );
+        },
+        child: CircleAvatar(
+          backgroundImage: newUser.userProfilePic == "-"
+              ? imgNotExist()
+              : imgExist(newUser.userProfilePic),
+          radius: 70,
+        ),
       ),
     );
   }
 
   userHasCoverPhoto(Users newUser) {
-    return ClipRect(
-      child: Container(
-        color: Colors.white12,
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .25,
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: Image.network(newUser.userProfileCover),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViewPhotos(img: newUser.userProfileCover),
+          ),
+        );
+      },
+      child: ClipRect(
+        child: Container(
+          color: Colors.white12,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * .25,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: Image.network(newUser.userProfileCover),
+          ),
         ),
       ),
     );

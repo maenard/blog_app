@@ -154,7 +154,7 @@ class _NewPostState extends State<NewPost> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'No',
+            'Cancel',
             style: GoogleFonts.poppins(),
           ),
         ),
@@ -171,8 +171,8 @@ class _NewPostState extends State<NewPost> {
             }
           },
           child: Text(
-            'Yes',
-            style: GoogleFonts.poppins(),
+            'Post',
+            style: GoogleFonts.poppins(color: Colors.blueAccent),
           ),
         ),
       ],

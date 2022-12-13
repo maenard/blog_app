@@ -322,17 +322,34 @@ class _RegisterState extends State<Register> {
       setState(() {
         error = e.message.toString();
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          duration: Duration(seconds: 5),
-          content: Text(
-            error,
-            style: GoogleFonts.poppins(),
-          ),
-        ),
-      );
+      customSnackBar(Icons.error_outline, error);
     }
     Navigator.pop(context);
+  }
+
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future createUser() async {

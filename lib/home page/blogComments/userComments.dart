@@ -142,11 +142,49 @@ class _UserCommentsState extends State<UserComments> {
                       ),
                     ),
                     const SizedBox(
-                      width: 10,
+                      width: 5,
                     ),
                     widget.users.id == comments.commenterId
                         ? allowEditDeleteComment(comments)
-                        : Container()
+                        : Container(),
+                    SizedBox(
+                      height: 20,
+                      width: 10,
+                      child: IconButton(
+                        splashRadius: 12,
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          if (comments.likes!.contains(user.uid)) {
+                            final newLikes = comments.likes;
+                            final newLikesCount = comments.likes!.length - 1;
+                            newLikes!.remove(user.uid);
+                            updateComment(
+                              comments.commentId,
+                              newLikes,
+                              newLikesCount,
+                            );
+                          } else {
+                            final newLikes = comments.likes;
+                            final newLikesCount = comments.likes!.length + 1;
+                            newLikes!.add(user.uid);
+                            updateComment(
+                              comments.commentId,
+                              newLikes,
+                              newLikesCount,
+                            );
+                          }
+                        },
+                        icon: comments.likes.contains(user.uid)
+                            ? liked()
+                            : notLiked(),
+                      ),
+                    ),
+                    Text(
+                      '  ${comments.likesCount} ',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -157,6 +195,21 @@ class _UserCommentsState extends State<UserComments> {
           ),
         ],
       );
+
+  notLiked() {
+    return const Icon(
+      Icons.thumb_up_alt_outlined,
+      size: 14,
+    );
+  }
+
+  liked() {
+    return const Icon(
+      Icons.thumb_up_alt,
+      size: 15,
+      color: Colors.blueAccent,
+    );
+  }
 
   allowEditDeleteComment(Comments comments) {
     return Row(
@@ -179,9 +232,7 @@ class _UserCommentsState extends State<UserComments> {
             ),
           ),
         ),
-        const SizedBox(
-          width: 10,
-        ),
+        const Text(' • '),
         GestureDetector(
           onTap: () {
             _showdialog(comments);
@@ -195,6 +246,7 @@ class _UserCommentsState extends State<UserComments> {
             ),
           ),
         ),
+        const Text(' • '),
       ],
     );
   }
@@ -233,8 +285,8 @@ class _UserCommentsState extends State<UserComments> {
               Navigator.pop(context);
             },
             child: Text(
-              'Yes',
-              style: GoogleFonts.poppins(color: Colors.white),
+              'Delete',
+              style: GoogleFonts.poppins(color: Colors.red),
             ),
           ),
         ],
@@ -363,10 +415,18 @@ class _UserCommentsState extends State<UserComments> {
     );
   }
 
+  updateComment(id, newLikes, newLikesCount) {
+    final docUser = FirebaseFirestore.instance.collection('comments').doc(id);
+    docUser.update({
+      'likes': newLikes,
+      'likesCount': newLikesCount,
+    });
+  }
+
   Stream<List<Comments>> readBlogsComments(id) => FirebaseFirestore.instance
       .collection('comments')
       .where('postId', isEqualTo: id)
-      .orderBy('commentime', descending: true)
+      .orderBy('likesCount', descending: true)
       .snapshots()
       .map(
         (snapshot) => snapshot.docs
@@ -396,6 +456,8 @@ class _UserCommentsState extends State<UserComments> {
       commentername: widget.users.name,
       commentime: DateTime.now(),
       postId: widget.blogs.postId,
+      likes: [],
+      likesCount: 0,
     );
 
     final json = newComment.toJson();

@@ -90,7 +90,7 @@ class _EditCommentsState extends State<EditComments> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'No',
+            'Cancel',
             style: GoogleFonts.poppins(),
           ),
         ),
@@ -102,8 +102,8 @@ class _EditCommentsState extends State<EditComments> {
                 Icons.check, 'You have successfully updated your comment.');
           },
           child: Text(
-            'Yes',
-            style: GoogleFonts.poppins(),
+            'Update',
+            style: GoogleFonts.poppins(color: Colors.blueAccent),
           ),
         ),
       ],

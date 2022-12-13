@@ -55,19 +55,20 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       height: 10,
                     ),
                     Text(
-                      "We have sent you an email.",
+                      "Forgot Password",
                       style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      "Please change your password.",
+                      "Enter your email  and we'll send you a link to reset your password.",
                       style: GoogleFonts.poppins(
                         color: Colors.white54,
                         fontSize: 15,
-                        height: .9,
+                        height: 1.2,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(
                       height: 50,
@@ -127,11 +128,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 if (isValidForm == true) {
                   canReSendResetPassEmail
                       ? resetPassword()
-                      : ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                'Please wait for a few second for another reset passsword email. Thank you!'),
-                          ),
+                      : customSnackBar(
+                          Icons.warning_amber_outlined,
+                          'Please wait a few seconds for another link. Thank you!',
                         );
                 }
               },
@@ -174,7 +173,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: emailcontroller.text.trim(),
       );
-      customSnackBar(Icons.email, 'Password reset email sent.');
+      customSnackBar(
+        Icons.email_outlined,
+        'Password reset link sent to ${emailcontroller.text}.',
+      );
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       customSnackBar(Icons.error_outline, e.message);

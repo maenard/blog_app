@@ -305,7 +305,7 @@ class _EditPostState extends State<EditPost> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'No',
+            'Cancel',
             style: GoogleFonts.poppins(),
           ),
         ),
@@ -322,8 +322,8 @@ class _EditPostState extends State<EditPost> {
             }
           },
           child: Text(
-            'Yes',
-            style: GoogleFonts.poppins(),
+            'Update',
+            style: GoogleFonts.poppins(color: Colors.blueAccent),
           ),
         ),
       ],
@@ -347,7 +347,7 @@ class _EditPostState extends State<EditPost> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'No',
+            'Cancel',
             style: GoogleFonts.poppins(),
           ),
         ),
@@ -363,8 +363,8 @@ class _EditPostState extends State<EditPost> {
             );
           },
           child: Text(
-            'Yes',
-            style: GoogleFonts.poppins(),
+            'Delete',
+            style: GoogleFonts.poppins(color: Colors.red),
           ),
         ),
       ],

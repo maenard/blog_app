@@ -6,6 +6,8 @@ class Comments {
   final postId;
   final commentId;
   final commenterId;
+  final likes;
+  final likesCount;
 
   Comments({
     required this.commenterimg,
@@ -15,6 +17,8 @@ class Comments {
     required this.postId,
     required this.commentId,
     required this.commenterId,
+    required this.likes,
+    required this.likesCount,
   });
 
   Map<String, dynamic> toJson() => {
@@ -25,6 +29,8 @@ class Comments {
         'postId': postId,
         'commentId': commentId,
         'commenterId': commenterId,
+        'likes': likes,
+        'likesCount': likesCount,
       };
 
   static Comments fromJson(Map<String, dynamic> json) => Comments(
@@ -35,5 +41,7 @@ class Comments {
         postId: json['postId'],
         commentId: json['commentId'],
         commenterId: json['commenterId'],
+        likes: json['likes'],
+        likesCount: json['likesCount'],
       );
 }

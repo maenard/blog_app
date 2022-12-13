@@ -4,6 +4,7 @@ import 'package:blog_app/home%20page/UserProfile/uploadProfilePic.dart';
 import 'package:blog_app/home%20page/blogComments/userComments.dart';
 import 'package:blog_app/home%20page/post/editPost.dart';
 import 'package:blog_app/home%20page/post/newPost.dart';
+import 'package:blog_app/home%20page/viewPhotos.dart';
 import 'package:blog_app/model/blogs.dart';
 import 'package:blog_app/model/users.dart';
 import 'package:blog_app/timeDiff.dart';
@@ -352,14 +353,24 @@ class _ProfileState extends State<Profile> {
       );
 
   blogHasPhoto(Blogs blogs) {
-    return ClipRect(
-      child: Container(
-        color: Colors.white12,
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .30,
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: Image.network(blogs.blogPhoto),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViewPhotos(img: blogs.blogPhoto),
+          ),
+        );
+      },
+      child: ClipRect(
+        child: Container(
+          color: Colors.white12,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * .30,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: Image.network(blogs.blogPhoto),
+          ),
         ),
       ),
     );
@@ -402,8 +413,8 @@ class _ProfileState extends State<Profile> {
                   Icons.check, 'You have successfully deleted your blog.');
             },
             child: Text(
-              'Yes',
-              style: GoogleFonts.poppins(color: Colors.white),
+              'Delete',
+              style: GoogleFonts.poppins(color: Colors.red),
             ),
           ),
         ],
@@ -434,7 +445,7 @@ class _ProfileState extends State<Profile> {
   liked() => Row(
         children: [
           const Icon(
-            Icons.thumb_up_sharp,
+            Icons.thumb_up_alt,
             color: Colors.blueAccent,
           ),
           Text(
@@ -446,7 +457,7 @@ class _ProfileState extends State<Profile> {
   notLiked() => Row(
         children: [
           const Icon(
-            Icons.thumb_up_sharp,
+            Icons.thumb_up_alt,
             color: Colors.white54,
           ),
           Text(
@@ -680,11 +691,21 @@ class _ProfileState extends State<Profile> {
       child: Stack(
         alignment: Alignment.topLeft,
         children: [
-          CircleAvatar(
-            backgroundImage: newUser.userProfilePic == "-"
-                ? imgNotExist()
-                : imgExist(newUser.userProfilePic),
-            radius: 70,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewPhotos(img: newUser.userProfilePic),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              backgroundImage: newUser.userProfilePic == "-"
+                  ? imgNotExist()
+                  : imgExist(newUser.userProfilePic),
+              radius: 70,
+            ),
           ),
           CircleAvatar(
             radius: 20,
@@ -714,14 +735,24 @@ class _ProfileState extends State<Profile> {
   userHasCoverPhoto(Users newUser) {
     return Stack(
       children: [
-        ClipRect(
-          child: Container(
-            color: Colors.white12,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * .25,
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: Image.network(newUser.userProfileCover),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ViewPhotos(img: newUser.userProfileCover),
+              ),
+            );
+          },
+          child: ClipRect(
+            child: Container(
+              color: Colors.white12,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * .25,
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: Image.network(newUser.userProfileCover),
+              ),
             ),
           ),
         ),
