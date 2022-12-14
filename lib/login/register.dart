@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -303,8 +304,11 @@ class _RegisterState extends State<Register> {
       context: context,
       useRootNavigator: false,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
+      builder: (context) => Center(
+        child: LoadingAnimationWidget.newtonCradle(
+          color: Colors.white,
+          size: 100,
+        ),
       ),
     );
 
