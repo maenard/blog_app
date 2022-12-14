@@ -335,9 +335,9 @@ class _HomeState extends State<Home> {
 
   likeGrammar(count) {
     if (count <= 1) {
-      return 'Like';
+      return ' Like';
     } else {
-      return 'Likes';
+      return ' Likes';
     }
   }
 

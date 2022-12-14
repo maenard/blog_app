@@ -118,7 +118,10 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
                   Colors.blueAccent,
                   () {
                     if (pickedCover == null) {
-                      snackBarError();
+                      customSnackBar(
+                        Icons.error_outline,
+                        'There is no picture picked.',
+                      );
                     } else {
                       widget.newUser.userProfileCover != '-'
                           ? deleteCoverPic(widget.newUser.userProfileCover)
@@ -133,18 +136,6 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
           ),
           buildProgress(),
         ],
-      ),
-    );
-  }
-
-  snackBarError() {
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: Duration(seconds: 5),
-        content: Text(
-          'There is no picture picked.',
-          style: GoogleFonts.poppins(),
-        ),
       ),
     );
   }
@@ -227,6 +218,31 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
           );
   }
 
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   deleteCoverPic(url) {
     var ref = FirebaseStorage.instance.refFromURL(url);
     ref.delete();
@@ -238,11 +254,6 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
       'userProfileCover': img,
     });
     Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        duration: Duration(seconds: 5),
-        content: Text('Cover photo uploaded successfully.'),
-      ),
-    );
+    customSnackBar(Icons.check, 'Cover photo uploaded successfully.');
   }
 }

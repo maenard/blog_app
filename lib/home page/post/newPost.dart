@@ -139,7 +139,9 @@ class _NewPostState extends State<NewPost> {
 
   customDialog() {
     return AlertDialog(
-      backgroundColor: Colors.black,
+      icon: const Icon(Icons.question_mark_outlined),
+      backgroundColor: const Color.fromARGB(255, 28, 28, 28),
+      actionsAlignment: MainAxisAlignment.center,
       title: Text(
         'Are you sure?',
         style: GoogleFonts.poppins(),
@@ -147,6 +149,7 @@ class _NewPostState extends State<NewPost> {
       content: Text(
         'This will add new blog to your account.',
         style: GoogleFonts.poppins(),
+        textAlign: TextAlign.center,
       ),
       actions: [
         TextButton(

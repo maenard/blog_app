@@ -155,6 +155,7 @@ class _ProfileState extends State<Profile> {
                       SizedBox(
                         width: 20,
                         child: PopupMenuButton(
+                          color: const Color.fromARGB(255, 28, 28, 28),
                           onSelected: (value) {
                             if (value == 'edit') {
                               Navigator.push(
@@ -377,13 +378,17 @@ class _ProfileState extends State<Profile> {
   }
 
   _popUpDialog(Blogs blogs) => AlertDialog(
+        icon: Icon(Icons.warning_amber_outlined),
+        backgroundColor: const Color.fromARGB(255, 28, 28, 28),
+        actionsAlignment: MainAxisAlignment.center,
         title: Text(
           'Are you sure?',
           style: GoogleFonts.poppins(color: Colors.white),
         ),
         content: Text(
-          'This blog will be deleted. You can not undo these changes.',
+          'This blog will be deleted. You can\'t undo these changes.',
           style: GoogleFonts.poppins(color: Colors.white),
+          textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
@@ -403,14 +408,16 @@ class _ProfileState extends State<Profile> {
               final userPost =
                   FirebaseFirestore.instance.collection('users').doc(user.uid);
               var newPostCount = 0;
-              var getPostCount = await userPost
+              await userPost
                   .get()
                   .then((value) => newPostCount = value.get('posts') - 1);
               batchDeleteComments(blogs.postId);
               deleteBlog(blogs.postId, newPostCount, user.uid);
               Navigator.of(context).pop();
               customSnackBar(
-                  Icons.check, 'You have successfully deleted your blog.');
+                Icons.check,
+                'You have successfully deleted your blog.',
+              );
             },
             child: Text(
               'Delete',
@@ -418,7 +425,6 @@ class _ProfileState extends State<Profile> {
             ),
           ),
         ],
-        backgroundColor: Colors.black,
       );
 
   _showdialog(Blogs blogs) => showDialog(

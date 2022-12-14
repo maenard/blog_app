@@ -75,7 +75,9 @@ class _EditCommentsState extends State<EditComments> {
 
   customDialog() {
     return AlertDialog(
-      backgroundColor: Colors.black,
+      icon: const Icon(Icons.question_mark_rounded),
+      backgroundColor: const Color.fromARGB(255, 28, 28, 28),
+      actionsAlignment: MainAxisAlignment.center,
       title: Text(
         'Are you sure?',
         style: GoogleFonts.poppins(),
@@ -83,6 +85,7 @@ class _EditCommentsState extends State<EditComments> {
       content: Text(
         'This will update your comment.',
         style: GoogleFonts.poppins(),
+        textAlign: TextAlign.center,
       ),
       actions: [
         TextButton(

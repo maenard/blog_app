@@ -119,7 +119,8 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
                   Colors.blueAccent,
                   () {
                     if (pickedProfile == null) {
-                      snackBarError();
+                      customSnackBar(
+                          Icons.error_outline, 'There is no image picked.');
                     } else {
                       widget.newUser.userProfilePic != '-'
                           ? deleteProfilePic(widget.newUser.userProfilePic)
@@ -133,18 +134,6 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
           ),
           buildProgress(),
         ],
-      ),
-    );
-  }
-
-  snackBarError() {
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: Duration(seconds: 5),
-        content: Text(
-          'There is no picture picked.',
-          style: GoogleFonts.poppins(),
-        ),
       ),
     );
   }
@@ -188,7 +177,6 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
         if (snapshot.hasData) {
           final data = snapshot.data!;
           double progress = data.bytesTransferred / data.totalBytes;
-
           return SizedBox(
             height: 25,
             child: Stack(
@@ -227,6 +215,31 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
           );
   }
 
+  customSnackBar(icon, msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 5),
+        content: Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.black,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Flexible(
+              child: Text(
+                msg,
+                style: GoogleFonts.poppins(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   deleteProfilePic(url) {
     var ref = FirebaseStorage.instance.refFromURL(url);
     ref.delete();
@@ -238,12 +251,7 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
       'userProfilePic': img,
     });
     Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        duration: Duration(seconds: 5),
-        content: Text('Profile photo uploaded successfully.'),
-      ),
-    );
+    customSnackBar(Icons.check, 'Profile photo uploaded successfully.');
   }
 
   Future<void> batchUpdateCommenterImg(id, imgUrl) {

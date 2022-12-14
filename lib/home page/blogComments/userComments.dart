@@ -252,6 +252,9 @@ class _UserCommentsState extends State<UserComments> {
   }
 
   _popUpDialog(Comments comments) => AlertDialog(
+        icon: const Icon(Icons.warning_amber_outlined),
+        backgroundColor: const Color.fromARGB(255, 28, 28, 28),
+        actionsAlignment: MainAxisAlignment.center,
         title: Text(
           'Are you sure?',
           style: GoogleFonts.poppins(color: Colors.white),
@@ -259,6 +262,7 @@ class _UserCommentsState extends State<UserComments> {
         content: Text(
           'This comment will be deleted. You can not undo these changes.',
           style: GoogleFonts.poppins(color: Colors.white),
+          textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
@@ -290,7 +294,6 @@ class _UserCommentsState extends State<UserComments> {
             ),
           ),
         ],
-        backgroundColor: Colors.black,
       );
 
   _showdialog(Comments comments) => showDialog(

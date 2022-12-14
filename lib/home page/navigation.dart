@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -116,10 +117,13 @@ class _NavigationState extends State<Navigation> {
 
   customDialog() {
     return AlertDialog(
-      backgroundColor: Colors.black,
+      icon: const Icon(Icons.logout_outlined),
+      backgroundColor: const Color.fromARGB(255, 28, 28, 28),
+      actionsAlignment: MainAxisAlignment.center,
       content: Text(
         'Are you sure you want to sign out?',
         style: GoogleFonts.poppins(),
+        textAlign: TextAlign.center,
       ),
       actions: [
         TextButton(
@@ -136,7 +140,9 @@ class _NavigationState extends State<Navigation> {
             FirebaseAuth.instance.signOut();
             Navigator.pop(context);
             customSnackBar(
-                Icons.check, 'You have successfully signed out your account');
+              Icons.check,
+              'You have successfully signed out your account',
+            );
           },
           child: Text(
             'Sign out',
