@@ -22,10 +22,12 @@ class ViewPhotos extends StatelessWidget {
           child: Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
-            child: Image.network(
-              img,
-              fit: BoxFit.fitWidth,
-            ),
+            child: img == '-'
+                ? Image.asset('assets/images/blank_profile.jpg')
+                : Image.network(
+                    img,
+                    fit: BoxFit.fitWidth,
+                  ),
           ),
         ),
       ),
