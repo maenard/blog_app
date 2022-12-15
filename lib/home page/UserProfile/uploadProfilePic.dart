@@ -8,6 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+
 class UploadProfilePic extends StatefulWidget {
   const UploadProfilePic({
     super.key,
@@ -55,6 +57,17 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
     final file = File(pickedProfile!.path!);
     final ref = FirebaseStorage.instance.ref().child(path);
 
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: LoadingAnimationWidget.newtonCradle(
+          color: Colors.white,
+          size: 100,
+        ),
+      ),
+    );
+
     try {
       setState(() {
         uploadTaskProfile = ref.putFile(file);
@@ -76,6 +89,7 @@ class _UploadProfilePicState extends State<UploadProfilePic> {
     setState(() {
       uploadTaskProfile = null;
     });
+    Navigator.pop(context);
   }
 
   @override

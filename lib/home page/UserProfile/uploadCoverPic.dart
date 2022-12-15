@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import "package:flutter/material.dart";
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class UploadCoverPic extends StatefulWidget {
   const UploadCoverPic({
@@ -56,6 +57,17 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
     final file = File(pickedCover!.path!);
     final ref = FirebaseStorage.instance.ref().child(path);
 
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: LoadingAnimationWidget.newtonCradle(
+          color: Colors.white,
+          size: 100,
+        ),
+      ),
+    );
+
     try {
       setState(() {
         uploadTaskCover = ref.putFile(file);
@@ -75,6 +87,8 @@ class _UploadCoverPicState extends State<UploadCoverPic> {
     setState(() {
       uploadTaskCover = null;
     });
+
+    Navigator.pop(context);
   }
 
   @override

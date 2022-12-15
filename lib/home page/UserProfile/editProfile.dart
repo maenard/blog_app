@@ -277,7 +277,9 @@ class _EditProfileState extends State<EditProfile> {
 
   customDialog() {
     return AlertDialog(
-      backgroundColor: Colors.black,
+      icon: const Icon(Icons.question_mark_outlined),
+      backgroundColor: const Color.fromARGB(255, 28, 28, 28),
+      actionsAlignment: MainAxisAlignment.center,
       title: Text(
         'Are you sure?',
         style: GoogleFonts.poppins(),
@@ -304,8 +306,8 @@ class _EditProfileState extends State<EditProfile> {
                 Icons.check, 'You have successfully updated your profile.');
           },
           child: Text(
-            'Yes',
-            style: GoogleFonts.poppins(),
+            'Save',
+            style: GoogleFonts.poppins(color: Colors.blueAccent),
           ),
         ),
       ],

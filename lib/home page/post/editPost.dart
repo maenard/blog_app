@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class EditPost extends StatefulWidget {
   const EditPost({
@@ -83,7 +84,7 @@ class _EditPostState extends State<EditPost> {
     setState(() {
       uploadTaskBlogPhoto = null;
     });
-    Navigator.pop(context);
+    // Navigator.pop(context);
   }
 
   @override
@@ -402,7 +403,7 @@ class _EditPostState extends State<EditPost> {
       'blogPhoto': url,
       'content': postcontroller.text,
     });
-    // Navigator.pop(context);
+    Navigator.pop(context);
     customSnackBar(Icons.check, 'You have successfully updated your blog.');
   }
 
